@@ -1,0 +1,158 @@
+
+<?php 
+echo $this->headLink()->appendStylesheet($this->basePath().'/css/consultation/espacerecherchemed.css');
+echo $this->headLink()->appendStylesheet($this->basePath().'/css/facturation/DatePicker.css'); 
+?>
+<?php 
+echo $this->headScript()->appendFile($this->basePath().'/js/consultation/espacerecherchemed.js');
+?>
+
+<?php
+use Facturation\View\Helper\DateHelper;
+$Control = new DateHelper();
+
+//Réduire la chaine addresse
+function adresseText2($Text){
+	$chaine = $Text;
+	if(strlen($Text)>30){
+		$chaine = substr($Text, 0, 30);
+		$nb = strrpos($chaine, ' ');
+		$chaine = substr($chaine, 0, $nb);
+		$chaine .=' ...';
+	}
+	return $chaine;
+}
+?>
+
+<script>
+//POUR LE MENU GAUCHE dans -elementgauche.phtml
+$('#plus_deces').toggle(true);
+$("#deces").replaceWith("<li id='deces' style='background:#4a5765;'><a href=''><span style='margin-left:0px; color: #ffffff; font-weight:bold; font-size:20px; font-family:Times New Roman;'> <img style='display: inline;' src='<?php echo $this->basePath().'/images_icons/moin-green2.png'?>' alt='Liste' /> Consultations </span></a></li>");
+dep_deces1();
+$('#liste_recherche_style').css({'font-weight':'bold','color':'white','font-size':'22px'});
+
+$(window).load(function () {
+
+	$('#wait').toggle(false);
+	$('#contenu, #titre').fadeIn().css({'visibility':'visible'});
+	 
+});
+</script>
+
+<style>
+#contenu, #titre{ visibility: hidden; }
+</style>
+
+
+<div id="titre" style='font-family: police2; color: green; font-size: 20px; font-weight: bold; padding-left:20px;'> <i style='font-size: 25px;'>&curren;</i> LISTE DES CONSULTATIONS</div>
+<div id="wait" style="color: gray; font-size: 20px; text-align: center; margin-top: 80px;" > <span> Chargement ... </span> </div>
+<div id="contenu" >
+        <div id="liste_personnel" style="float:right; margin-right: 0px; height:5px; margin-top: 10px;">
+        <img id="rechercher" style="display: inline; margin-bottom: 10px; height:22px; width:22px; padding-right:0px;" src='<?php echo $this->basePath().'/images_icons/calendar_16.PNG'?>' alt="Terminer" title="Rechercher">
+        <input type="text" id="calendrier" class="calendrier" />
+        </div>
+		<table class="table table-bordered  tab_list_mini" id="patient">
+			<thead>
+				<tr style="height:50px; curor:pointer;">
+					<th id="nom" >Nom</th>
+					<th id="prenom" >Pr&eacute;nom</th>
+					<th id="date" >Date. naiss</th>
+					<th id="sexe" >Sexe</th>
+					<th id="adresse" >Adresse</th>
+					<th id="nationalite" >Nationalit&eacute;</th>
+					<th id="effectuer">Options</th>
+				</tr>
+			</thead>
+
+			<tbody>
+
+			    <!-- *****************On affiche maintenant tous ceux pour qui on a pris les constantes depuis toujours*********** -->
+
+
+			    <?php foreach($this->donnees as $donnees) :?>
+			    
+			    <?php 
+	   		       $date_naissance = $donnees['Datenaissance'];
+	   		       if($date_naissance){ $date_naissance = $Control->convertDate($donnees['Datenaissance']); }else{ $date_naissance = "";}
+	   		     ?> 
+
+				<tr>
+				    <td id="nomMaj"><?php echo $this->escapeHtml($donnees['Nom']);?></td>
+				    <td><?php echo $this->escapeHtml($donnees['Prenom']);?></td>
+					<td><?php echo $this->escapeHtml($date_naissance);?></td>
+					<td><?php echo $this->escapeHtml($donnees['Sexe']);?></td>
+					<td><?php echo $this->escapeHtml(adresseText2($donnees['Adresse'])) ;?></td>
+					<td><?php echo $this->escapeHtml($donnees['Nationalite']);?></td>
+					<td>
+					    <a href="<?php echo $this->url('consultation', array('action'=>'recherche-visualisation-consultation'), array('query'=>array('id_patient'=>$this->escapeHtml($donnees['Id']),'id_cons'=>$this->escapeHtml($donnees['Id_cons']))));?>">
+					    <hass> <img style="display: inline;" src='<?php echo $this->basePath().'/images_icons/voir2.png'?>' title=" Visualisation" >
+					    </hass></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+					    <a>
+					      <img style="display: inline;" src='<?php echo $this->basePath().'/images_icons/tick_16.png'?>' title="Terminer">
+					    </a>
+
+					    <a id='<?php $Id_cons = $this->escapeHtml($donnees['Id_cons']); echo 'cal'.$Id_cons ?>'>
+					    <?php echo $Control->convertDate($this->escapeHtml($donnees['Dateonly']));?>
+					    </a>
+					</td>
+				</tr>
+
+				<script>
+				  $("<?php echo '#cal'.$Id_cons ?>").toggle(false);
+
+
+				  $('#patient tbody tr').contextmenu({
+					target: '#context-menu',
+					onItem: function (context, e) {
+						
+						if($(e.target).text() == 'Visualisation' || $(e.target).is('#visualisationCTX')){
+							visualisation('<?php echo $donnees['Id']; ?>','<?php echo $donnees['Id_cons'];?>');
+						}
+					}
+
+				 })
+				</script>
+				 
+				<?php endforeach; ?>
+
+
+			    <!-- *************************************************************************** -->
+			</tbody>
+
+			<tfoot  class="foot_style">
+				<tr>
+					<th id="nom_" style='width: 13%;'><input type="text" name="search_browser" value=" Nom" class="search_init" /></th>
+					<th id="prenom_" style='width: 15%;'><input type="text" name="search_browser" value=" Prenom" class="search_init" /></th>
+					<th id="date_" style='width: 12%;'><input type="text" name="search_browser" value=" Date naissance" class="search_init" /></th>
+					<th id="sexe_" style='width: 7%;'><input type="text" name="search_browser" value=" Sexe" class="search_init" /></th>
+					<th id="adresse_" style='width: 28%;'><input type="text" name="search_browser" value=" Adresse" class="search_init" /></th>
+					<th id="nationalite_" style='width: 15%;'><input type="text" name="search_browser" value=" Nationalite" class="search_init" /></th>
+					<th id="effectuer_" style='width: 10%;'><input type="hidden" name="search_browser" value="" class="" /></th>
+
+				</tr>
+			</tfoot>
+		</table>
+</div>
+
+
+
+<div id="context-menu">
+    <ul class="dropdown-menu" >
+         <li><a style="cursor: pointer;" ><img id="visualisationCTX" style='margin-right: 10px; width: 19px; height: 16px;' src='/simens/public/images_icons/voir2.png'>Visualisation</a></li>
+         <li class="divider"></li>
+         <li><a id="quitterCTX"  style="cursor: pointer;">Quitter</a></li>
+    </ul>
+</div>
+
+
+
+<script type="text/javascript">
+initialisation();
+calendrier();
+
+function visualisation(idPatient, id_cons){
+	vart=tabUrl[0]+'public/consultation/recherche-visualisation-consultation?id_patient='+idPatient+'&id_cons='+id_cons;
+    $(location).attr("href",vart);
+}
+</script>

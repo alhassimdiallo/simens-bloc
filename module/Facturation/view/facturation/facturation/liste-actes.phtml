@@ -1,0 +1,175 @@
+<!-- MES STYLES -->
+<?php echo $this->headLink()->appendStylesheet($this->basePath().'/css/facturation/styleListeActes.css');?>
+
+<!-- MES JS -->
+<?php echo $this->headScript()->appendFile($this->basePath().'/js/facturation/jsListeActes.js');?>
+
+<?php use  Facturation\View\Helper\DateHelper;
+$Control = new DateHelper();?>
+
+<script type="text/javascript">
+var base_url = window.location.toString();
+var tabUrl = base_url.split("public");
+
+$('#plus_admission').toggle(true);
+$("#admission").replaceWith("<li id='admission' style='background:#4a5765;'><a href=''><span style='margin-left:0px; color: #ffffff; font-weight:bold; font-size:20px; font-family:Times New Roman;'> <img style='display: inline;' src='"+tabUrl[0]+"public/images_icons/moin-green2.png' alt='Liste' /> Facturation </span></a></li>");
+dep_admission1();
+$('#liste_acte_style').css({'font-weight':'bold','color':'white','font-size':'22px'});
+
+
+$(window).load(function () {
+	$('#wait').toggle(false);
+	$('#contenuDesInterfaces').fadeIn().css({'visibility':'visible'});
+});
+</script>
+
+<style>
+#contenuDesInterfaces{ visibility: hidden; };
+</style>
+
+
+<div id="titre" style='font-family: police2; text-decoration:none; color: green; font-size: 18px; font-weight: bold; padding-left: 35px;'><iS style='font-size: 25px;'>&curren;</iS> LISTE DES ACTES <span>IMPAYES</span> PAR PATIENT </div>
+     
+<div id="wait" style="color: gray; font-size: 20px; text-align: center; margin-top: 80px;" > <span> Chargement ... </span> </div>
+     
+<div id="contenuDesInterfaces" >
+ 
+  <div id="LesDeuxListes" >
+     <div id="menuFiltre" style="margin-right: 50px; float:right; font-size: 15px; margin-top:5px; font-family: Times New Roman; font-size: 15px; color: green;"> <i style='cursor:pointer;' id='afficherImpayer'> Actes impay&eacute;s </i> <span style='font-weight: bold; font-size: 22px;'> | </span> <i style='cursor:pointer;' id='afficherPayer'> Actes pay&eacute;s  </i> </div>
+     <div id="contenu" >
+		<table style='width:95%; margin-left: 10px; align:center' class="table table-bordered tab_list_mini" id="patientActesImpayes">
+			<thead >
+			    <tr >
+				    <th id="idpatient_" style='width: 10%;'><input type="text" name="search_browser" value=" ID_Patient" class="search_init" /></th>
+					<th id="nom_" style='width: 15%;'><input type="text" name="search_browser" value=" Nom" class="search_init" /></th>
+					<th id="prenom_" style='width: 17%;'><input type="text" name="search_browser" value=" Pr&eacute;nom" class="search_init" /></th>
+					<th id="date_" style='width: 13%;'><input type="text" name="search_browser" value=" Date naissance" class="search_init" /></th>
+					<th id="adresse_" style='width: 40%;'><input type="text" name="search_browser" value=" Adresse" class="search_init" /></th>
+					<th id="effectuer_" style='width: 5%;'><input type="hidden" value="" class="" />Options</th>
+
+				</tr>
+			</thead>
+
+			
+			<tbody id="donnees" class="liste_patient">
+
+	            <?php /* AFFICHAGE DE LA LISTE DES ACTES IMPAYES DES PATIENTS  */?>
+
+			</tbody>
+
+			
+		</table>
+
+     </div>
+     
+     <div id="contenu2" >
+		<table style='width:95%; margin-left: 10px; align:center' class="table table-bordered tab_list_mini" id="patientActesPayes">
+			<thead >
+			    <tr >
+				    <th id="idpatient_2" style='width: 10%;'><input type="text" name="search_browser" value=" ID_Patient" class="search_init" /></th>
+					<th id="nom_2" style='width: 15%;'><input type="text" name="search_browser" value=" Nom" class="search_init" /></th>
+					<th id="prenom_2" style='width: 17%;'><input type="text" name="search_browser" value=" Pr&eacute;nom" class="search_init" /></th>
+					<th id="date_2" style='width: 13%;'><input type="text" name="search_browser" value=" Date naissance" class="search_init" /></th>
+					<th id="adresse_2" style='width: 40%;'><input type="text" name="search_browser" value=" Adresse" class="search_init" /></th>
+					<th id="effectuer_2" style='width: 5%;'><input type="hidden" value="" class="" />Options</th>
+
+				</tr>
+			</thead>
+
+			
+			<tbody id="donnees" class="liste_patient">
+
+	            <?php /* AFFICHAGE DE LA LISTE DES ACTES IMPAYES DES PATIENTS  */?>
+
+			</tbody>
+
+			
+		</table>
+
+     </div>
+
+  </div>
+     
+     <script type="text/javascript">
+      initialisation();
+      initialisation2();
+
+      $('#afficherImpayer').css({'font-weight':'bold', 'font-size':'18px'});
+      $('#afficherImpayer').click(function(){
+    	  $('#afficherImpayer').css({'font-weight':'bold', 'font-size':'18px'});
+    	  $('#afficherPayer').css({'font-weight':'normal', 'font-size':'15px'})
+    	  $('#contenu').toggle(true);
+    	  $('#contenu2').toggle(false);
+    	  $('#titre span').html('IMPAYES');
+      });
+
+      $('#afficherPayer').click(function(){
+    	  $('#afficherPayer').css({'font-weight':'bold', 'font-size':'18px'})
+    	  $('#afficherImpayer').css({'font-weight':'normal', 'font-size':'15px'})
+    	  $('#contenu').toggle(false);
+    	  $('#contenu2').toggle(true);
+    	  $('#titre span').html('PAYES');
+      });
+     </script>
+     
+     
+<!-- POP UP pour Confirmation Suppression -->
+                            <div id="confirmation" title="Informations" style="display:none;">
+                              <div id="info" style="font-size: 16px;">
+
+                              </div>
+                            </div>
+
+
+<!-- LES BOUTONS "TERMINER" ou "VALIDER" -->
+
+
+<!-- PARTIE ENREGISTREMENT DU DECES -->
+
+    <div id="paiement_des_actes">
+          <a href="" id="precedent" style="text-decoration: none; font-family: police2; width:50px; margin-left:30px;">
+	        <img style=" display: inline; " src='<?php echo $this->basePath().'/images_icons/transfert_gauche.PNG'?>' alt='Constantes' title="Rechercher" />
+		    Pr&eacute;c&eacute;dent
+		  </a>
+		  <input type="hidden" id="temoinActe" >
+
+		  <div id="info_patient_acte"> 
+		      <!-- INFORMATIONS SUR LE PATIENT ET LA LISTE DES ACTES--> 
+		  </div>
+
+		  <div id="styleTableActe">
+          </div>
+                    
+		  
+    </div>
+    
+    <form id="FormulaireImprimerFactureActe" style="display: none;">
+       <button id="ImprimerFactureActe"></button>
+    </form>
+
+</div>
+
+<div id="context-menu">
+    <ul class="dropdown-menu" >
+         <li><a style="cursor: pointer;" ><img id="visualiserCTX" style='margin-right: 10px; width: 19px; height: 16px;' src='/simens/public/images_icons/voir2.png'>Visualiser</a></li>
+         <li class="divider2"></li>
+         <li><a style="cursor: pointer;"><img  id="suivantCTX" style='margin-right: 10px; width: 19px; height: 16px;' src='/simens/public/images_icons/transfert_droite.png'>Suivant</a></li>
+         <li class="divider"></li>
+         <li><a id="quitterCTX"  style="cursor: pointer;">Quitter</a></li>
+    </ul>
+</div>
+		
+		
+<script>
+animation();
+$('#service').val("");
+function ajouterMaman(){
+	vart=tabUrl[0]+'public/facturation/ajouter';
+    $(location).attr("href",vart);
+    return false;
+}
+
+scriptFactMajor();
+</script>
+
+

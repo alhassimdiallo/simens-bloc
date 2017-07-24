@@ -1,0 +1,849 @@
+<script> 
+var base_url = window.location.toString();
+var tabUrl = base_url.split("public");
+//POUR LE MENU GAUCHE dans -elementgauche.phtml
+$('#plus_admissionbloc').toggle(true);
+$("#admissionbloc").replaceWith("<li id='admissionbloc' style='background:#4a5765;'><a href=''><span style='margin-left:0px; color: #ffffff; font-weight:bold; font-size:20px; font-family:Times New Roman;'> <img style='display: inline;' src='"+tabUrl[0]+"public/images_icons/moin-green2.png' /> Bloc op&eacute;ratoire </span></a></li>");
+dep_admissionbloc1();
+$('#liste_admissionbloc_style').css({'font-weight':'bold','color':'white','font-size':'22px'});
+</script>
+
+<?php header("Cache-Control:no-cache"); ?>
+
+<!-- MES STYLES -->
+<?php 
+
+echo $this->headLink()->appendStylesheet($this->basePath().'/css/pikachoose/bottom.css');
+echo $this->headScript()->appendFile($this->basePath().'/js/plugins/pikachoose/jquery.jcarousel.min.js');
+echo $this->headScript()->appendFile($this->basePath().'/js/plugins/pikachoose/jquery.pikachoose.min.js');
+
+echo $this->headScript()->appendFile($this->basePath().'/js/plugins/fancybox/source/jquery.fancybox.js');
+echo $this->headLink()->appendStylesheet($this->basePath().'/js/plugins/fancybox/source/jquery.fancybox.css');
+
+echo $this->headLink()->appendStylesheet($this->basePath().'/css/consultation/styleProtocoleOperatoire.css');
+
+?>
+
+<!-- MES JS -->
+<?php 
+echo $this->headScript()->appendFile($this->basePath().'/js/consultation/protocoleOperatoireImg.js');
+echo $this->headScript()->appendFile($this->basePath().'/js/consultation/protocoleOperatoireMp3.js');
+
+echo $this->headLink()->appendStylesheet($this->basePath().'/js/plugins/dateTimePicker/jquery-ui-timepicker-addon.css');
+echo $this->headScript()->appendFile($this->basePath().'/js/plugins/dateTimePicker/jquery-ui-timepicker-addon.js');
+
+echo $this->headScript()->appendFile($this->basePath().'/js/consultation/jsListeProtocoleOperatoire.js');
+?>
+
+
+<style>
+#contenuInterface{ visibility: hidden; };
+</style>
+
+<script type="text/javascript">
+$(window).load(function () {
+	$('#wait').toggle(false);
+	$('#contenuInterface').fadeIn().css({'visibility':'visible'});
+});
+</script>
+
+<div id="titre" style='font-family: police2; text-decoration: none; color: green; font-size: 20px; font-weight: bold; padding-left:20px;'>
+	<iS style='font-size: 25px;'>&curren;</iS>
+	LISTE DES PATIENTS
+</div>
+<div id="wait" style="color: gray; font-size: 20px; text-align: center; margin-top: 80px;" > <span> Chargement ... </span> </div>
+
+<div id="contenuInterface" >
+<div id="contenu">
+
+			<table class="table table-bordered tab_list_mini" id="patient">
+				<thead>
+					<tr style="height: 50px; width:100%;">
+						<th id="nom" style='cursor: pointer;'>Nom</th>
+						<th id="prenom" style='cursor: pointer;'>Pr&eacute;nom</th>
+						<th id="age" style='cursor: pointer;'>Age</th>
+						<th id="sexe" style='cursor: pointer;'>Sexe</th>
+						<th id="diagnostic" style='cursor: pointer;'>Dignostic</th>
+						<th id="intervention" style='cursor: pointer;'>Intervention</th>
+						<th id="effectuer">Options</th>
+					</tr>
+				</thead>
+
+				<tbody id="donnees" class="liste_patient">
+
+					<!-- ************ On affiche les patients en une liste ordonnï¿½e************ -->
+
+				</tbody>
+
+				<tfoot id="foot" class="foot_style">
+					<tr>
+						<th id="nom_" style='width: 13%;'><input type="text" name="search_browser"
+							value=" Nom" class="search_init" /></th>
+						<th id="prenom_" style='width: 15%;'><input type="text" name="search_browser"
+							value=" Pr&eacute;nom" class="search_init" /></th>
+						<th id="age_" style='width: 5%;'><input type="text" name="search_browser"
+							value=" Age " class="search_init" /></th>
+						<th id="sexe_" style='width: 7%;'><input type="text" name="search_browser"
+							value=" Sexe" class="search_init" /></th>
+						<th id="diagnostic_" style='width: 30%;'><input type="text" name="search_browser"
+							value=" Diagnostic" class="search_init" /></th>
+						<th id="intervention_" style='width: 20%;'><input type="text" name="search_browser"
+							value=" Intervention" class="search_init" /></th>
+						<th id="effectuer_" style='width: 10%;'><input type="hidden" name="search_browser"
+							value="" class="" /></th>
+
+					</tr>
+					
+					
+				</tfoot>
+			</table>
+</div>
+
+
+<div id="informationAdmissionBloc">
+  <div id="vue_patient"> </div>
+  
+  <div id="vue_admission" align="center" > 
+  
+    <div style="width: 94%; margin-bottom: 30px; margin-top: 230px;">
+           
+        <div id="lesDemandesAnalyses" style="width: 100%;">
+				                  
+			<?php 
+			  $form = $this->form ;
+		      $form->setAttribute ( 'action', $this->url ( 'consultation', array ('action' => 'modifier-protocole-operatoire') ) );
+		      $form->prepare();
+		      echo $this->form()->openTag($form);
+		    ?>
+			
+			<div id="tabs" >
+               <ul>
+                   <li id='VisitePreAnesthesiqueTabs'><a href="#tabs-1">Visite pr&eacute;-anesth&eacute;sique</a></li>
+                   <li id='CompteRenduTabs'><a href="#tabs-2">Compte rendu op&eacute;ratoire</a></li>
+                   
+                   <li id='Audio'><a href="#tabs-5">Audio +</a></li>
+                   
+                   <li id='CompteRenduAnesthesiqueTabs'><a href="#tabs-3">Compte rendu anesth&eacute;sique</a></li>
+                   <!--li id='TransfertPostOpTabs'><a href="#tabs-4">Transfert post-op</a></li-->
+               </ul>
+ 
+               <div id="tabs-1">  
+               
+               
+               </div>
+                                  
+               <div id="tabs-2" style=" height: 650px;">  
+                    
+                    
+                   <div id="form_radio" style="float:left; margin-top: -5px; ">
+                     <label>
+                       Check-list de s&eacute;curit&eacute; :
+                       
+                       <select id="check_list" onchange="choix_check_list(this.value)" style="height: 20px; margin-top: 5px; margin-bottom: 3px;"> 
+                         <option value="1" style="color: green;"> Oui </option>
+                         <option value="0" style="color: red;"> Non </option>
+                       </select> 
+                      
+                     </label>
+                   </div>
+                   <div style='cursor: pointer; float:left; margin-top: 0px; margin-left: 15px; font-size: 14px;' class="calendrierDateIntervention"> <input id="calendrierDateIntervention" name="calendrierDateIntervention" style='width: 150px; margin-top: -1px; padding-left: 4px; padding-right: 3px;' type='text'> </div>
+                   <div style='cursor: pointer; float:left; margin-top: -3px; margin-left: 0px;'> <a href="javascript:afficherCalendrierDateInter()" > <img src="<?php echo $this->basePath().'/images_icons/calendar_24.png';?>" title="Date & Heure de l'op&eacute;ration" ></a></div> 
+		           <div style='cursor: pointer; float:left; margin-top: -3px; margin-left: 10px;' id="entrerDonneesOperateur"> <a href="javascript:entrerDonneesOperateur()" > <img class="entrerDonneesOperateur" src="<?php echo $this->basePath().'/images_icons/surgeon_24.png';?>" ></a></div> 
+		           <input type='hidden' id='infoNomPrenomOperateur' name='infoNomPrenomOperateur'>
+                    
+                   <span id='dateEnregistrement' style='padding-right: 20px; padding-left: 0px; font-size: 14px;'> 09/12/2016 </span>
+                   <div style='cursor: pointer; float:right; margin-top: 5px;'> <span style='padding-left: 20px; color: green; font-size: 17px; font-family: times new roman;'> </span>  <hass> <a href="javascript:imprimerCRO();" ><img style="margin-top: -15px; float: right; cursor: pointer;" src="../images_icons/pdf.png"  title="Imprimer" /></a> </hass>    <hass> <a href="javascript:modifierDonnees();" ><img style="margin-top: -15px; float: right; margin-right: 15px; cursor: pointer;" src="../images_icons/pencil_32.png"  title="Modifier" /></a> </hass> </div>
+                   <div style="border-bottom: 1px solid gray; margin-top: 10px; margin-bottom: 10px;"></div>
+                   
+		       <?php echo $this->formhidden($form->get('id_patient')); ?>   
+		       <?php echo $this->formhidden($form->get('id_admission')); ?> 
+		       <?php echo $this->formhidden($form->get('id_protocole')); ?> 
+		       <?php echo $this->formhidden($form->get('check_list_securite')); ?> 
+		       <div style='width: 100%; float:left;'>
+		         <table id="form_patient" style="width:100%;">
+		             <tr id="form_patient_radio" style='width: 100%;'>
+		                 <td style='width: 33%;' class="comment-form-patient"><?php echo $this->formRow($form->get('anesthesiste'));?></td>
+		                 <td style='width: 33%;' class="comment-form-patient"><?php echo $this->formRow($form->get('indication'));?></td>
+		                 <td style='width: 33%;' class="comment-form-patient"><?php echo $this->formRow($form->get('type_anesthesie'));?></td>
+		             </tr>
+		         </table>
+		         
+		         <table id="form_patient" style="width:100%;">
+		             <tr style='width: 100%;'>
+		                 <td style='width: 66%;' class="comment-form-patient protocole_operatoire" ><?php echo $this->formRow($form->get('protocole_operatoire'));?></td>
+		                 <td style='width: 33%; background: re;' class="comment-form-patient" rowspan="2" >
+		                 
+		                    <table id="respondeee" class="imageCompteRenduOperatoire" style="width: 100%;">
+                                   <tr class="form-examen-morphologique" style="width: 100%;">
+                                       <th style="width: 100%; padding-bottom:15px; margin-right: 40px;"> 
+                                           <!-- PIKACHOOSE -->
+                                           <!-- PIKACHOOSE -->
+                                           <div id="pika">
+                                             <div id="pika2" align="center">
+                                                <!-- EMPLACEMENT DES IMAGES -->
+                                                <!-- EMPLACEMENT DES IMAGES -->
+                                                <!-- EMPLACEMENT DES IMAGES -->
+                                             </div>
+                                           </div>
+                                           <div id="AjoutImage" style="float: right; position: relative; bottom: 42px; right: 15px;">
+                                                  <input type='file' name="fichier" />
+			                                      <!-- RECUPERER L'IMAGE -->
+			                                      <input type='hidden' id="fichier_tmp" name="fichier_tmp" />
+			                                      <!-- FICHIER TAMPON POUR RECUPERER L'IMAGE DANS LE CONTROLLER -->
+                                           </div>
+                                       </th>
+                                   </tr>
+                                   <tr><td align="center" style='height: 70px; background: re;' id="imageWaiting" >  </td></tr>
+                            </table>
+		                 
+		                 </td>
+		             </tr>
+		             
+		             <tr style='width: 100%;'>
+    		              <td style='width: 66%;' class="comment-form-patient complications"><?php echo $this->formRow($form->get('complications'));?></td> 		                
+		             </tr>
+		         </table>
+		         
+		         <table id="form_patient" style="width:100%;">
+		            <tr id="form_patient" style='width: 100%;'>
+		                 <td style='width: 66%;' class="comment-form-patient soins_post_operatoire" ><?php echo $this->formRow($form->get('soins_post_operatoire'));?></td>
+		                 <td style='width: 33%;' class="comment-form-patient participants"><?php echo $this->formRow($form->get('aides_operateurs'));?></td>
+		            </tr>
+		          </table>
+		         
+		         
+		         <!-- POP UP pour Confirmation Suppression -->
+                 <div id="confirmation" title="Confirmation de la suppression" style="display:none;">
+                   <p style="font-size: 15px;">
+                      <span style="float:left; margin:0 0px 20px 0; ">
+                      <img src="<?php echo $this->basePath().'/images_icons/warning_16.png';?>" />
+                      Etes-vous s&ucirc;r de vouloir supprimer l'image ?</span>
+                   </p>
+                 </div>
+		         
+		       </div>
+
+		       </div>
+		       
+		       
+		       <div id="tabs-5">  
+		       
+		          <?php
+                    echo $this->headLink()->appendStylesheet($this->basePath().'/js/plugins/jPlayer-2.9.2/dist/skin/blue.monday/css/jplayer.blue.monday.min.css');
+                    echo $this->headScript()->appendFile($this->basePath().'/js/plugins/jPlayer-2.9.2/dist/jplayer/jquery.jplayer.min.js');
+                    echo $this->headScript()->appendFile($this->basePath().'/js/plugins/jPlayer-2.9.2/dist/add-on/jplayer.playlist.min.js');
+                  ?>
+		          <table id="form_patient" style="width:100%;">
+		            <tr id="form_patient" style='width: 100%;'>
+		              <td style="width: 45%;" class="comment-form-patient">
+		                 
+		                 <div id="AfficherLecteur" style='vertical-align:top;'>
+                             <!-- ****** EMPLACEMENT DU LECTEUR AUDIO (MP3)********* --> 
+                         </div>
+		                 
+		              </td> 
+		              
+		              <td align="center" style="width: 15%; height: 30px;" id="mp3Waiting" >
+		              
+		              </td>
+		              
+		              <td style="width: 40%;" class="comment-form-patient note_cro">
+		                 <?php echo $this->formRow($form->get('note_audio_cro'));?>
+		              </td>
+		            </tr>
+		            
+		          </table>
+		          <script type="text/javascript">
+                  </script>
+		          
+               </div>
+               
+		       
+		       <div id="tabs-3">  
+                  <table id="form_cra" class="form_cra" style="width:100%;">
+		            <tr id="form_cra" style='width: 100%; background: re;'>
+		              <td class="comment-form-cra" style="width: 50%;  background: yello;" >
+		                 <?php echo $this->formRow($form->get('position_installation'));?>
+		              </td> 
+		              
+		              <td class="comment-form-cra" style="width: 50%;" >
+		                 <?php echo $this->formRow($form->get('acces_veineux'));?>
+		              </td>
+		            </tr>
+		            
+		            <tr id="form_cra" style='width: 100%; background: re;'>
+		              <td class="comment-form-cra" style="width: 50%;  background: yello;" >
+		                 <?php echo $this->formRow($form->get('preremplissage'));?>
+		              </td> 
+		              
+		              <td class="comment-form-cra" style="width: 50%;" >
+		                 <?php echo $this->formRow($form->get('antibiotique'));?>
+		              </td>
+		            </tr>
+		            
+		            <tr id="form_cra" style='width: 100%; background: re;'>
+		              <td class="comment-form-cra" style="width: 50%;  background: yello;" >
+		                 <?php echo $this->formRow($form->get('monitorrage'));?>
+		              </td> 
+		              
+		              <td class="comment-form-cra" style="width: 50%;" >
+		                 <?php echo $this->formRow($form->get('type_anesthesie_2'));?>
+		              </td>
+		            </tr>
+		            
+		            <tr id="form_cra" style='width: 100%; background: re;'>
+		              <td class="comment-form-cra" style="width: 50%;  background: yello;" >
+		                 <?php echo $this->formRow($form->get('score_cormack'));?>
+		              </td> 
+		              
+		              <td class="comment-form-cra" style="width: 50%;" >
+		                 <?php echo $this->formRow($form->get('induction_anesthesique'));?>
+		              </td>
+		            </tr>
+		            
+		            <tr id="form_cra" style='width: 100%; background: re;'>
+		              <td class="comment-form-cra" style="width: 50%;  background: yello;" >
+		                 <?php echo $this->formRow($form->get('entretien_anesthesique'));?>
+		              </td> 
+		              
+		              <td class="comment-form-cra" style="width: 50%;" >
+		                 <?php echo $this->formRow($form->get('hemodynamique_per_operatoire'));?>
+		              </td>
+		            </tr>
+		            
+		            <tr id="form_cra" style='width: 100%; background: re;'>
+		              <td class="comment-form-cra" style="width: 50%;  background: yello;" >
+		                 <?php echo $this->formRow($form->get('reveil_extubation'));?>
+		              </td> 
+		              
+		              <td class="comment-form-cra" style="width: 50%;" >
+		                 <?php //echo $this->formRow($form->get('bilan_hydrique'));?>
+		              </td>
+		            </tr>
+		            
+		            <tr id="form_cra" style='width: 100%;'>
+		              <td colspan="2" class="comment-form-cra" style="width: 100%;  background: yello;" >
+		               <fieldset> 
+		                <legend>Bilan Hydrique</legend>  
+		                <table style="width: 100%;" >
+		                  <tr style="width: 100%;" >
+		                    <td class="comment-form-cra" style="width: 50%;" >
+		                      <?php echo $this->formRow($form->get('entrees'));?>
+	        	            </td>
+	        	            <td class="comment-form-cra" style="width: 50%;" >
+		                      <?php echo $this->formRow($form->get('sorties'));?>
+	        	            </td>
+		                  </tr>
+		                </table>
+		                </fieldset>
+		              </td> 
+		            </tr>
+		          </table>
+               </div>
+               
+               <div id="tabs-4">  
+                  <!-- ************* -->
+               </div>
+               
+		    </div>
+				   
+			<button style="display: none;" id="enregistrerProtocoleOperatoire"></button>
+            <?php echo $this->form()->closeTag(); ?>
+                
+                
+     	</div>
+           
+     </div>
+		  
+     <table style="margin-top: 5px; margin-bottom: 30px; width: 100%;  height: 12px;">
+	   <tr>
+	     <td style="width: 42%;"> </td>
+	     <td style="width: 10%;"> </td>
+	     <td style="width: 10%;" id="thoughtbot" class='boutonTerminer'> </td>
+	     <td style="width: 38%;"> </td>
+	   </tr>
+     </table>
+  
+  </div>
+  
+</div>
+
+</div>
+
+
+<form id="FormulaireImprimerProtocoleOperatoire" style="display: none;">
+    <button id="ImprimerProtocoleOperatoire"></button>
+</form>
+
+
+
+<div id="context-menu">
+    <ul class="dropdown-menu" >
+         <li><a style="cursor: pointer;" ><img id="visualiserCTX" style='margin-right: 10px; width: 19px; height: 16px;' src='/simens/public/images_icons/voir2.png'>Visualiser</a></li>
+         <li class="divider2"></li>
+         <li><a style="cursor: pointer;"><img  id="modifierCTX" style='margin-right: 10px; width: 19px; height: 16px;' src='/simens/public/images_icons/pencil_16.png'>Modifier</a></li>
+         <li class="divider"></li>
+         <li><a id="quitterCTX"  style="cursor: pointer;">Quitter</a></li>
+    </ul>
+</div>
+
+
+<script type="text/javascript">
+initialisation();
+$("#check_list_securite").val(1);
+function choix_check_list(x){ 
+	$("#check_list_securite").val(x); 
+
+	if(x==0){
+		$("#check_list").css({'color':'red'});
+	}else{
+		$("#check_list").css({'color':'green'});
+	}
+}
+
+var myArrayAnteriorite = []; var i = 0;
+var myArrayAnterioriteSOP = []; var j = 0;
+var myArrayAnterioriteIPO = []; var k = 0;
+var myArrayAnterioriteTAPO = []; var l = 0;
+
+</script>
+
+
+<?php 
+// Protocole opératoire
+// Protocole opératoire
+// Protocole opératoire
+
+for ($i = 0 ; $i < count($this->listeProtocole) ; $i++){
+    $leProtocole = $this->listeProtocole[$i];    
+    
+    if(strlen($leProtocole) > 220){
+
+       $textDecouper = wordwrap($leProtocole, 220, "\n", true); // On découpe le texte
+       $textDecouperTab = explode( "\n" ,$textDecouper);
+
+       //$reduireText = str_split($leProtocole, 80);
+       $label = $textDecouperTab[0]." ...";
+    }else{
+       $label = $leProtocole;
+    }
+    
+?>
+
+<script> 
+   myArrayAnteriorite[i++] =  { label : "<?php echo $label; ?>" , desc : "<?php echo $leProtocole; ?>" } 
+</script>
+
+<?php } ?>
+
+
+
+<?php 
+// Soins post opératoire
+// Soins post opératoire
+// Soins post opératoire
+
+ for ($i = 0 ; $i < count($this->listeProtocoleSOP) ; $i++){
+	$leSoinPostOp = $this->listeProtocoleSOP[$i];
+    
+    if(strlen($leSoinPostOp) > 220){
+
+       $textDecouperSOP = wordwrap($leSoinPostOp, 220, "\n", true); // On découpe le texte
+       $textDecouperTabSOP = explode( "\n" ,$textDecouperSOP);
+
+       $labelSOP = $textDecouperTabSOP[0]." ...";
+    }else{
+       $labelSOP = $leSoinPostOp;
+    }
+ 
+?>
+
+<script> 
+   myArrayAnterioriteSOP[j++] =  { label : "<?php echo $labelSOP; ?>" , desc : "<?php echo $leSoinPostOp; ?>" } 
+</script>
+
+<?php } ?>
+
+
+<?php 
+ // Indication PO
+ // Indication PO 
+ // Indication PO 
+ foreach ($this->listeIndicationPO as $listeIndicationPO){ 
+    $indication = str_replace("'", "\'", $listeIndicationPO['indication']);
+    $label = $indication;
+?>
+
+  <script> 
+    myArrayAnterioriteIPO[k++] =  { label : "<?php echo $label; ?>" , desc : "<?php echo $indication; ?>" } 
+  </script>
+
+<?php } ?>
+
+
+<?php 
+ // Type Anesthesie PO
+ // Type Anesthesie PO 
+ // Type Anesthesie PO 
+ foreach ($this->listeTypeAnesthesiePO as $listeTypeAnesthesiePO){ 
+    $type_anesthesie = str_replace("'", "\'", $listeTypeAnesthesiePO['type_anesthesie']);
+    $label = $type_anesthesie;
+?>
+
+  <script> 
+    myArrayAnterioriteTAPO[l++] =  { label : "<?php echo $label; ?>" , desc : "<?php echo $type_anesthesie; ?>" } 
+  </script>
+
+<?php } ?>
+
+
+<script>
+$( "#protocole_operatoire" ).autocomplete({
+	  source: myArrayAnteriorite,
+	  select : function(event, ui){ // lors de la sélection d'une proposition
+            setTimeout(function(){ $("#protocole_operatoire").val(ui.item.desc); });
+	  }
+});
+
+$( "#soins_post_operatoire" ).autocomplete({
+	  source: myArrayAnterioriteSOP,
+	  select : function(event, ui){ // lors de la sélection d'une proposition
+        setTimeout(function(){ $("#soins_post_operatoire").val(ui.item.desc); });
+	  }
+});
+
+
+$( "#indication" ).autocomplete({
+	  source: myArrayAnterioriteIPO,
+	  select : function(event, ui){ // lors de la sélection d'une proposition
+    setTimeout(function(){ $("#indication").val(ui.item.desc); });
+	  }
+});
+
+$( "#type_anesthesie" ).autocomplete({
+	  source: myArrayAnterioriteTAPO,
+	  select : function(event, ui){ // lors de la sélection d'une proposition
+         setTimeout(function(){ $("#type_anesthesie").val(ui.item.desc); });
+
+	  }
+});
+
+$('#anesthesiste, #indication, #type_anesthesie, .form_cra input').keypress(function(event) {
+	if (event.keyCode == 13) { return false; }
+});
+</script>
+
+
+
+<?php 
+//GESTION DES LISTES DES COMPTES RENDUS ANESTHESIQUES
+//GESTION DES LISTES DES COMPTES RENDUS ANESTHESIQUES
+?>
+<script>
+var myArrayPositionInstallation = []; var l = 0;
+var myArrayAccesVeineux = []; var l2 = 0;
+var myArrayAntibiotique = []; var l3 = 0;
+var myArrayPreremplissage = []; var l4 = 0;
+var myArrayMonitorrage = []; var l5 = 0;
+var myArrayInductionAnesthesique = []; var l6 = 0;
+var myArrayEntretienAnesthesique = []; var l7 = 0;
+var myArrayHemodynamiquePerOperatoire = []; var l8 = 0;
+var myArrayReveilExtubation = []; var l9 = 0;
+var myArrayBilanHydrique = []; var l10 = 0;
+var myArrayEntrees = []; var l11 = 0;
+var myArraySorties = []; var l12 = 0;
+var myArrayScoreCormack = []; var l13 = 0;
+var myArrayTypeAnesthesie = []; var l14 = 0;
+</script>
+
+<?php 
+ // Position installation
+ // Position installation 
+ // Position installation
+ foreach ($this->listeCraPositionInstallation as $listeCraPositionInstallation){ 
+    $infoCraPositionInstallation = str_replace("'", "\'", $listeCraPositionInstallation['designation']);
+?>
+  <script> 
+    myArrayPositionInstallation[l++] =  { label : "<?php echo $listeCraPositionInstallation['designation']; ?>" , desc : "<?php echo $infoCraPositionInstallation; ?>" } 
+  </script>
+<?php } ?>
+
+
+<?php 
+ // Acces Veineux
+ // Acces Veineux 
+ // Acces Veineux
+ foreach ($this->listeCraAccesVeineux as $listeCraAccesVeineux){ 
+    $infoCraAccesVeineux = str_replace("'", "\'", $listeCraAccesVeineux['designation']);
+?>
+  <script> 
+    myArrayAccesVeineux[l2++] =  { label : "<?php echo $listeCraAccesVeineux['designation']; ?>" , desc : "<?php echo $infoCraAccesVeineux; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Antibiotique
+ // Antibiotique 
+ // Antibiotique
+ foreach ($this->listeCraAntibiotique as $listeCraAntibiotique){ 
+    $infoCraAntibiotique = str_replace("'", "\'", $listeCraAntibiotique['designation']);
+?>
+  <script> 
+    myArrayAntibiotique[l3++] =  { label : "<?php echo $listeCraAntibiotique['designation']; ?>" , desc : "<?php echo $infoCraAntibiotique; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Pre-remplissage 
+ // Pre-remplissage 
+ // Pre-remplissage
+ foreach ($this->listeCraPreremplissage as $listeCraPreremplissage){ 
+    $infoCraPreremplissage = str_replace("'", "\'", $listeCraPreremplissage['designation']);
+?>
+  <script> 
+    myArrayPreremplissage[l4++] =  { label : "<?php echo $listeCraPreremplissage['designation']; ?>" , desc : "<?php echo $infoCraPreremplissage; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Monitorrage 
+ // Monitorrage
+ // Monitorrage
+ foreach ($this->listeCraMonitorrage as $listeCraMonitorrage){ 
+    $infoCraMonitorrage = str_replace("'", "\'", $listeCraMonitorrage['designation']);
+?>
+  <script> 
+    myArrayMonitorrage[l5++] =  { label : "<?php echo $listeCraMonitorrage['designation']; ?>" , desc : "<?php echo $infoCraMonitorrage; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Induction anesthesique 
+ // Induction anesthesique
+ // Induction anesthesique
+ foreach ($this->listeCraInductionAnesthesique as $listeCraInductionAnesthesique){ 
+    $infoCraInductionAnesthesique = str_replace("'", "\'", $listeCraInductionAnesthesique['designation']);
+?>
+  <script> 
+    myArrayInductionAnesthesique[l6++] =  { label : "<?php echo $listeCraInductionAnesthesique['designation']; ?>" , desc : "<?php echo $infoCraInductionAnesthesique; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Entretien anesthesique 
+ // Entretien anesthesique
+ // Entretien anesthesique
+ foreach ($this->listeCraEntretienAnesthesique as $listeCraEntretienAnesthesique){ 
+    $infoCraEntretienAnesthesique = str_replace("'", "\'", $listeCraEntretienAnesthesique['designation']);
+?>
+  <script> 
+    myArrayEntretienAnesthesique[l7++] =  { label : "<?php echo $listeCraEntretienAnesthesique['designation']; ?>" , desc : "<?php echo $infoCraEntretienAnesthesique; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Hemodynamique PerOperatoire
+ // Hemodynamique PerOperatoire
+ // Hemodynamique PerOperatoire
+ foreach ($this->listeCraHemodynamiquePerOperatoire as $listeCraHemodynamiquePerOperatoire){ 
+    $infoCraHemodynamiquePerOperatoire = str_replace("'", "\'", $listeCraHemodynamiquePerOperatoire['designation']);
+?>
+  <script> 
+    myArrayHemodynamiquePerOperatoire[l8++] =  { label : "<?php echo $listeCraHemodynamiquePerOperatoire['designation']; ?>" , desc : "<?php echo $infoCraHemodynamiquePerOperatoire; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Réveil / Extubation
+ // Réveil / Extubation
+ // Réveil / Extubation
+ foreach ($this->listeCraReveilExtubation as $listeCraReveilExtubation){ 
+    $infoCraReveilExtubation = str_replace("'", "\'", $listeCraReveilExtubation['designation']);
+?>
+  <script> 
+    myArrayReveilExtubation[l9++] =  { label : "<?php echo $listeCraReveilExtubation['designation']; ?>" , desc : "<?php echo $infoCraReveilExtubation; ?>" } 
+  </script>
+<?php } ?>
+
+
+<?php 
+ // Bilan Hydrique
+ // Bilan Hydrique
+ // Bilan Hydrique
+ foreach ($this->listeCraBilanHydrique as $listeCraBilanHydrique){ 
+    $infoCraBilanHydrique = str_replace("'", "\'", $listeCraBilanHydrique['designation']);
+?>
+  <script> 
+    myArrayBilanHydrique[l10++] =  { label : "<?php echo $listeCraBilanHydrique['designation']; ?>" , desc : "<?php echo $infoCraBilanHydrique; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Entrees
+ // Entrees
+ // Entrees
+ foreach ($this->listeCraEntrees as $listeCraEntrees){ 
+    $infoCraEntrees = str_replace("'", "\'", $listeCraEntrees['designation']);
+?>
+  <script> 
+    myArrayEntrees[l11++] =  { label : "<?php echo $listeCraEntrees['designation']; ?>" , desc : "<?php echo $infoCraEntrees; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Sorties
+ // Sorties
+ // Sorties
+ foreach ($this->listeCraSorties as $listeCraSorties){ 
+    $infoCraSorties = str_replace("'", "\'", $listeCraSorties['designation']);
+?>
+  <script> 
+    myArraySorties[l12++] =  { label : "<?php echo $listeCraSorties['designation']; ?>" , desc : "<?php echo $infoCraSorties; ?>" } 
+  </script>
+<?php } ?>
+
+<?php 
+ // Score Cormack
+ // Score Cormack
+ // Score Cormack
+ foreach ($this->listeCraScoreCormack as $listeCraScoreCormack){ 
+    $infoCraScoreCormack = str_replace("'", "\'", $listeCraScoreCormack['designation']);
+?>
+  <script> 
+    myArrayScoreCormack[l13++] =  { label : "<?php echo $listeCraScoreCormack['designation']; ?>" , desc : "<?php echo $infoCraScoreCormack; ?>" } 
+  </script>
+<?php } ?>
+
+
+<?php 
+ // Type anesthésie
+ // Type anesthésie
+ // Type anesthésie
+ foreach ($this->listeCraTypeAnesthesie as $listeCraTypeAnesthesie){ 
+    $infoCraTypeAnesthesie = str_replace("'", "\'", $listeCraTypeAnesthesie['designation']);
+?>
+  <script> 
+    myArrayTypeAnesthesie[l14++] =  { label : "<?php echo $listeCraTypeAnesthesie['designation']; ?>" , desc : "<?php echo $infoCraTypeAnesthesie; ?>" } 
+  </script>
+<?php } ?>
+
+
+<script>
+$( "#position_installation" ).autocomplete({
+	  source: myArrayPositionInstallation,
+});
+$( "#acces_veineux" ).autocomplete({
+	  source: myArrayAccesVeineux,
+});
+$( "#antibiotique" ).autocomplete({
+	  source: myArrayAntibiotique,
+});
+$( "#preremplissage" ).autocomplete({
+	  source: myArrayPreremplissage,
+});
+$( "#monitorrage" ).autocomplete({
+	  source: myArrayMonitorrage,
+});
+$( "#induction_anesthesique" ).autocomplete({
+	  source: myArrayInductionAnesthesique,
+});
+$( "#entretien_anesthesique" ).autocomplete({
+	  source: myArrayEntretienAnesthesique,
+});
+$( "#hemodynamique_per_operatoire" ).autocomplete({
+	  source: myArrayHemodynamiquePerOperatoire,
+});
+$( "#reveil_extubation" ).autocomplete({
+	  source: myArrayReveilExtubation,
+});
+$( "#bilan_hydrique" ).autocomplete({
+	  source: myArrayBilanHydrique,
+});
+$( "#entrees" ).autocomplete({
+	  source: myArrayEntrees,
+});
+$( "#sorties" ).autocomplete({
+	  source: myArraySorties,
+});
+$( "#score_cormack" ).autocomplete({
+	  source: myArrayScoreCormack,
+});
+$( "#type_anesthesie_2" ).autocomplete({
+	  source: myArrayTypeAnesthesie,
+});
+
+
+
+
+
+//GESTION DE LA DATE D4INTERVENTION
+//GESTION DE LA DATE D4INTERVENTION
+$('.calendrierDateIntervention input').attr('readonly', true).css('background','#ffffff');
+
+var entreAffCalendar = 1;
+function afficherCalendrierDateInter(){
+	if ($('#calendrierDateIntervention').val() != "" ) {
+
+		$('#calendrierDateIntervention').focus();
+	    
+	} else {
+
+		$('.calendrierDateIntervention').animate({
+		        width : 'toggle'
+        },100);
+
+		if(entreAffCalendar == 0){ 
+			$('#calendrierDateIntervention').focus(); 
+			entreAffCalendar = 1;
+		}else
+			if(entreAffCalendar == 1){ 
+				entreAffCalendar = 0; 
+			}
+	}
+}
+
+infoNomPrenomOperateur = '<?php echo $this->prenomNom; ?>';
+infoNomPrenomProprioCompte = infoNomPrenomOperateur;
+$('#infoNomPrenomOperateur').val(infoNomPrenomOperateur);
+</script>
+
+
+
+
+
+<style>
+
+.ui-autocomplete{
+    background: #f8f8f8;
+	
+ 	width: 50px; 
+	max-height: 250px;
+	overflow-y: auto; 
+    overflow-x: hidden;
+}
+
+.jp-ajouter {
+	cursor: pointer;
+}
+
+#fichierMp3 input{ 
+	right:0;
+	top:0;
+	opacity:0;
+	font-size:0px;
+	-moz-opacity:0;
+	filter:alpha(opacity=0);
+	cursor:pointer;
+	text-align:right;
+	width:1px;
+	height:1px;
+}  
+
+/*GESTION DU tooltip*/
+/*GESTION DU tooltip*/
+.w2ui-overlay{
+	margin-top:6px;  
+ 	margin-left: -27px;
+}
+
+</style>
