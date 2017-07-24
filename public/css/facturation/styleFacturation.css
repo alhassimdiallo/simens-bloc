@@ -117,7 +117,7 @@ canvas {
               float: left;
               margin-right:40px;
               overflow:hidden;
-              background:#dddddd url("/simens/public/images_icons/identite.png") no-repeat left top;
+              background:#dddddd url("../../images_icons/identite.png") no-repeat left top;
         }
   
         .photo_patient input {
@@ -502,19 +502,19 @@ tr:hover /* Apparence au survol des lignes */
               display: inline;float:left;border:transparent; margin-bottom: 5px; margin-top:5px;
          } 
 .vider_formulaire {
-	          background: url("/simens/public/images_icons/annuler1.PNG") no-repeat right top;
+	          background: url("../../images_icons/annuler1.PNG") no-repeat right top;
                
          }
 .supprimer_photo {
-	          background: url("/simens/public/images_icons/mod.png") no-repeat right top;
+	          background: url("../../images_icons/mod.png") no-repeat right top;
                
          }
 .ajouter_photo {
-	          background: url("/simens/public/images_icons/ajouterphoto.png") no-repeat right top;
+	          background: url("../../images_icons/ajouterphoto.png") no-repeat right top;
                
          }
 .modifer_donnees {
-	          background: url("/simens/public/images_icons/modifier.png") no-repeat right top;
+	          background: url("../../images_icons/modifier.png") no-repeat right top;
                
          }
          
