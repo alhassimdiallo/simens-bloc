@@ -1782,11 +1782,6 @@ class PatientTable {
 	
 		$date = (new \DateTime ( 'now' ))->format ( 'Y-m-d' );
 	
-		$sql2 = new Sql ($db );
-		$subselect1 = $sql2->select ();
-		$subselect1->from ( array ( 'p' => 'protocole_operatoire_bloc' ) );
-		$subselect1->columns (array ( 'id_admission_bloc' ) );
-	
 		/*
 		 * SQL queries
 		*/
@@ -1797,8 +1792,9 @@ class PatientTable {
 		->join(array('a' => 'admission_bloc') , 'a.id_patient = pat.ID_PERSONNE' , array('*'))
 		->join(array('se' => 'service_employe') , 'se.id_employe = a.operateur' , array('*'))
 		->join(array('s' => 'service') , 's.ID_SERVICE = se.id_service' , array('NomService' => 'NOM'))
+		->join(array('p' => 'protocole_operatoire_bloc' ) , 'p.id_admission_bloc = a.id_admission' , array('*'))
 		->order(array('a.date' => 'DESC' , 'a.heure' => 'DESC'))
-		->where(array('a.operateur'=> $idOperateur, new In ( 'a.id_admission', $subselect1 )));
+		->where(array('a.operateur'=> $idOperateur));
 		/* Data set length after filtering */
 		$stat = $sql->prepareStatementForSqlObject($sQuery);
 		$rResultFt = $stat->execute();

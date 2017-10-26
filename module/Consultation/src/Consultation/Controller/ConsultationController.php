@@ -50,6 +50,9 @@ use Consultation\Form\ProtocoleOperatoireForm;
 use Consultation\View\Helpers\CompteRenduOperatoirePdf;
 use Consultation\View\Helpers\CompteRenduOperatoirePage2Pdf;
 use Zend\XmlRpc\Value\String;
+use Consultation\View\Helpers\fpdf181;
+use Consultation\View\Helpers\fpdf181\fpdf;
+use Consultation\View\Helpers\fpdf181\PDF;
 
 class ConsultationController extends AbstractActionController {
 	protected $controlDate;
@@ -5793,27 +5796,36 @@ class ConsultationController extends AbstractActionController {
 		$id_admission = $this->params ()->fromPost ( 'id_admission', 0 );
 		$InfoAdmission = $this->getAdmissionTable()->getPatientAdmisBloc($id_admission);
 		
-		//Récupération des données
+		//Récupération des données 
 		$donnees['anesthesiste'] = str_replace("â€™", "'", $this->params ()->fromPost ( 'anesthesiste' ));
+		$donnees['anesthesiste'] = str_replace("’", "'", $this->params ()->fromPost ( 'anesthesiste' ));
+		
 		$donnees['indication'] = str_replace("â€™", "'", $this->params ()->fromPost (  'indication' ));
+		$donnees['indication'] = str_replace("’", "'", $this->params ()->fromPost (  'indication' ));
 		$donnees['indication'] = str_replace("œ", "oe" ,$donnees['indication']); //A revoir
 		
 		$donnees['type_anesthesie'] = str_replace("â€™", "'", $this->params()->fromPost('type_anesthesie'));
+		$donnees['type_anesthesie'] = str_replace("’", "'", $this->params()->fromPost('type_anesthesie'));
 		$donnees['type_anesthesie'] = str_replace("œ", "oe" ,$donnees['type_anesthesie']); //A revoir
 		
 		$donnees['protocole_operatoire'] = str_replace("â€™", "'", $this->params()->fromPost('protocole_operatoire'));
+		$donnees['protocole_operatoire'] = str_replace("’", "'", $this->params()->fromPost('protocole_operatoire'));
 		$donnees['protocole_operatoire'] = str_replace("œ", "oe" ,$donnees['protocole_operatoire']); //A revoir
 		
 		$donnees['soins_post_operatoire'] = str_replace("â€™", "'", $this->params()->fromPost('soins_post_operatoire'));
+		$donnees['soins_post_operatoire'] = str_replace("’", "'", $this->params()->fromPost('soins_post_operatoire'));
 		$donnees['soins_post_operatoire'] = str_replace("œ", "oe" ,$donnees['soins_post_operatoire']); //A revoir
 		
 		$donnees['check_list_securite'] = $this->params()->fromPost( 'check_list_securite');
 		$donnees['note_audio_cro'] = str_replace("â€™", "'", $this->params()->fromPost('note_audio_cro'));
+		$donnees['note_audio_cro'] = str_replace("’", "'", $this->params()->fromPost('note_audio_cro'));
 		$donnees['note_audio_cro'] = str_replace("œ", "oe" ,$donnees['note_audio_cro']); //A revoir
 		
 		$donnees['aides_operateurs'] = str_replace("â€™", "'", $this->params()->fromPost('aides_operateurs'));
+		$donnees['aides_operateurs'] = str_replace("’", "'", $this->params()->fromPost('aides_operateurs'));
 		
 		$donnees['complications'] = str_replace("â€™", "'", $this->params()->fromPost('complications'));
+		$donnees['complications'] = str_replace("’", "'", $this->params()->fromPost('complications'));
 		$donnees['complications'] = str_replace("œ", "oe" ,$donnees['complications']); //A revoir
 		
 		$donnees['dateIntervention'] =  $control->getDateInDateTimeDHM( $this->params ()->fromPost ( 'calendrierDateIntervention' ) );
@@ -6235,8 +6247,8 @@ class ConsultationController extends AbstractActionController {
 		$prenomNom = $user['Prenom'].' '.$user['Nom'];
 		
 		$formPO = new ProtocoleOperatoireForm();
-		$listeProtocolePO = $this->getAdmissionTable()->getListeProtocoleOperatoireBloc();
-		$listeProtocoleSOP = $this->getAdmissionTable()->getListeSoinsPostOperatoireBloc();
+		$listeProtocolePO = $this->getAdmissionTable()->getListeProtocoleOperatoireBloc2();
+		$listeProtocoleSOP = $this->getAdmissionTable()->getListeSoinsPostOperatoireBloc2();
 		$listeIndicationPO = $this->getAdmissionTable()->getListeIndicationPOBloc();
 		$listeTypeAnesthesiePO = $this->getAdmissionTable()->getListeTypeAnesthesiePOBloc();
 		
@@ -7194,6 +7206,47 @@ class ConsultationController extends AbstractActionController {
 	
 	
 	
-	//PARTIE MATERNITE --- PARTIE MATERNITE --- PARTIE MATERNITE --- 
-	//PARTIE MATERNITE --- PARTIE MATERNITE --- PARTIE MATERNITE --- 
+	//Test du plugin fpdf181  --- Test du plugin fpdf181 --- Test du plugin fpdf181 --- 
+	//Test du plugin fpdf181  --- Test du plugin fpdf181 --- Test du plugin fpdf181 --- 
+	protected $txt = "
+				Aujourd’hui, les technologies de l’information et de la communication (TIC) sont présentes partout. Elles sont dans les secteurs comme les grandes distributions ainsi que les secteurs privés et publics en général. Le secteur de la santé est aujourd’hui sans doute l’un des domaines où les TIC ont eu des avancées très importantes.
+				";
+	
+	public function fpdfDocumentAction()
+	{
+		$pdf = new PDF();
+		$pdf->SetMargins(13.5,13.5,13.5);
+		
+// 		$titre =  iconv ('UTF-8' ,'ISO-8859-1//TRANSLIT' ,"Vingt mille é ' ’ où œ lieues sous les mers");
+ 		$titreTxt = iconv ('UTF-8' ,null ,"UN  éCUEIL FUYANT");
+		$txt = iconv ('UTF-8' ,null, "Aujourd'hui,  œ afficher  les technologies 
+- de l’information et de la communication (TIC) 
+- <B> sont présentes partout. Elles sont dans les secteurs comme les grandes distributions ainsi que les secteurs privés et publics en général. Le secteur de la santé est aujourd’hui sans doute l’un des domaines où les TIC ont eu des avancées très importantes.
+				");
+		
+		
+		
+		$txt2 = iconv ('UTF-8' ,null, "Aujourd'hui,  œ afficher  les technologies
+- de l’information et de la communication (TIC)
+				");
+		
+		//$txt = iconv ('UTF-8' ,null , $txt);
+		//var_dump(mb_detect_encoding($titre)); exit();
+		//var_dump(iconv ('UTF-8' ,null , $txt)); exit();
+		//var_dump(mb_detect_encoding(iconv ('UTF-8' ,null , $txt))); exit();
+		
+		//var_dump(iconv_get_encoding()); exit();
+		
+		$pdf->setTxt( $txt );
+		$pdf->setTxt2( $txt2 );
+		
+		//$pdf->SetTitle($titre);
+		//$pdf->SetAuthor('Jules Verne');
+		$pdf->AjouterText(1,$titreTxt);
+		//$pdf->AjouterChapitre(2,'LE POUR ET LE CONTRE','20k_c2.txt');
+		$pdf->Output('I');
+	}
+	
+	
 }
+

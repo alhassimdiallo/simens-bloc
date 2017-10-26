@@ -271,6 +271,13 @@ return array(
     						        'ajouter-mp3-protocole' => array('medecin', 'superAdmin'),
     						        'inserer-bd-mp3-protocole' => array('medecin', 'superAdmin'),
     						        'supprimer-mp3-protocole' => array('medecin', 'superAdmin'),
+    								
+    								
+    								
+    								
+    								
+    								//POUR LE TEST DU PLUGIN FPDF
+    								'fpdf-document'  => array('medecin', 'superAdmin'),
     						),
     						
     						

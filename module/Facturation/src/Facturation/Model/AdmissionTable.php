@@ -4,6 +4,7 @@ namespace Facturation\Model;
 
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Sql\Sql;
+use Zend\Db\Sql\Predicate\In;
 
 class AdmissionTable {
 	protected $tableGateway;
@@ -184,8 +185,8 @@ class AdmissionTable {
 	    $db = $this->tableGateway->getAdapter();
 	    $sql = new Sql($db);
 	    $sQuery = $sql->select('protocole_operatoire_bloc')
-	    ->group("protocole_operatoire");
-//	    ->where(array("id_protocole < ?" => 450));
+	    ->group("protocole_operatoire")
+	    ->where(array("id_protocole < ?" => 100));
 	    
 	    $requete = $sql->prepareStatementForSqlObject($sQuery);
 	    return $requete->execute();
@@ -195,10 +196,33 @@ class AdmissionTable {
 	    $db = $this->tableGateway->getAdapter();
 	    $sql = new Sql($db);
 	    $sQuery = $sql->select('protocole_operatoire_bloc')
-	    ->group("soins_post_operatoire");
+	    ->group("soins_post_operatoire")
+	    ->where(array("id_protocole < ?" => 100));
 	     
 	    $requete = $sql->prepareStatementForSqlObject($sQuery);
 	    return $requete->execute();
+	}
+	
+	public function getListeProtocoleOperatoireBloc2(){
+		$db = $this->tableGateway->getAdapter();
+		$sql = new Sql($db);
+		$sQuery = $sql->select('protocole_operatoire_bloc')
+		->group("protocole_operatoire")
+		->where(array("id_protocole < ?" => 50));
+		 
+		$requete = $sql->prepareStatementForSqlObject($sQuery);
+		return $requete->execute();
+	}
+	
+	public function getListeSoinsPostOperatoireBloc2(){
+		$db = $this->tableGateway->getAdapter();
+		$sql = new Sql($db);
+		$sQuery = $sql->select('protocole_operatoire_bloc')
+		->group("soins_post_operatoire")
+		->where(array("id_protocole < ?" => 50));
+	
+		$requete = $sql->prepareStatementForSqlObject($sQuery);
+		return $requete->execute();
 	}
 	
 	public function getListeIndicationPOBloc(){
