@@ -23,6 +23,10 @@ use Facturation\Model\AdmissionTable;
 use Facturation\Model\ServiceTable;
 use Facturation\Model\Service;
 use Facturation\Mail\MailSender;
+use Facturation\Model\DiagnosticTable;
+use Facturation\Model\Diagnostic;
+use Facturation\Model\AdmissionBlocTable;
+use Facturation\Model\AdmissionBloc;
 
 
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface, ServiceProviderInterface, ViewHelperProviderInterface {
@@ -121,7 +125,28 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
 							$resultSetPrototype->setArrayObjectPrototype(new Service());
 							return new TableGateway('service', $dbAdapter, null, $resultSetPrototype);
 						},
-						
+						'Facturation\Model\DiagnosticTable' => function ($sm) {
+							$tableGateway = $sm->get('DiagnosticTableFactGateway');
+							$table = new DiagnosticTable($tableGateway);
+							return $table;
+						},
+						'DiagnosticTableFactGateway' => function($sm) {
+							$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+							$resultSetPrototype = new ResultSet();
+							$resultSetPrototype->setArrayObjectPrototype(new Diagnostic());
+							return new TableGateway('diagnostic_bloc', $dbAdapter, null, $resultSetPrototype);
+						},
+						'Facturation\Model\AdmissionBlocTable' => function ($sm) {
+							$tableGateway = $sm->get('AdmissionBlocTableFactGateway');
+							$table = new AdmissionBlocTable($tableGateway);
+							return $table;
+						},
+						'AdmissionBlocTableFactGateway' => function($sm) {
+							$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+							$resultSetPrototype = new ResultSet();
+							$resultSetPrototype->setArrayObjectPrototype(new AdmissionBloc());
+							return new TableGateway('admission_bloc', $dbAdapter, null, $resultSetPrototype);
+						},
 						
 						
 						

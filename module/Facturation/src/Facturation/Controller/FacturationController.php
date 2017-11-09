@@ -61,6 +61,8 @@ class FacturationController extends AbstractActionController {
 	protected $consultationTable;
 	protected $demandeActeTable;
 	protected $_galerieMailSender;
+	protected $diagnostic_bloc;
+	protected $admissionBlocTable;
 	
 	public function getPatientTable() {
 		if (! $this->patientTable) {
@@ -119,6 +121,22 @@ class FacturationController extends AbstractActionController {
 			$this->demandeActeTable = $sm->get ( 'Consultation\Model\DemandeActeTable' );
 		}
 		return $this->demandeActeTable;
+	}
+	
+	public function getDiagnosticBlocTable() {
+		if (! $this->diagnostic_bloc) {
+			$sm = $this->getServiceLocator ();
+			$this->diagnostic_bloc = $sm->get ( 'Facturation\Model\DiagnosticTable' );
+		}
+		return $this->diagnostic_bloc;
+	}
+	
+	public function getAdmissionBlocTable() {
+		if (! $this->admissionBlocTable) {
+			$sm = $this->getServiceLocator ();
+			$this->admissionBlocTable = $sm->get ( 'Facturation\Model\AdmissionBlocTable' );
+		}
+		return $this->admissionBlocTable;
 	}
 	
 	//GESTION DE LA GALERIE DES MAILS
@@ -327,6 +345,11 @@ class FacturationController extends AbstractActionController {
 		$layout = $this->layout ();
 		$layout->setTemplate ( 'layout/facturation' );
 		
+		//$listeDiagnostic = $this->getDiagnosticBlocTable()->getListeDIagnostic();
+		//$listeAdmissionBloc = $this->getAdmissionBlocTable()->getListeAdmissionBloc();
+		//var_dump($listeDiagnostic); exit();
+		
+		
 		$numero = $this->numeroFacture();
 		//INSTANCIATION DU FORMULAIRE D'ADMISSION
 		$formAdmission = new AdmissionBlocForm();
@@ -413,6 +436,20 @@ class FacturationController extends AbstractActionController {
 				'form' => $formAdmission
 		);
 		
+	}
+	
+	public function getListeDiagnosticBlocAction() {
+		
+		$listeDiagnostic = $this->getDiagnosticBlocTable()->getListeDiagnostic();
+		
+		$script ="<script> var tabListeDIagnostic = new Array(); </script>";
+		for($i=0 ; $i < count($listeDiagnostic) ; $i++){
+			$script .="<script> tabListeDIagnostic[".$i."] = '".$listeDiagnostic[$i]['libelle']."' </script>";
+		}
+		$script .="<script> $( '#diagnostic' ).autocomplete({ source: tabListeDIagnostic }); </script>";
+	
+		$this->getResponse ()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html; charset=utf-8' );
+		return $this->getResponse ()->setContent ( Json::encode ( $script ) );
 	}
 	
 	public function getServiceAction() {
@@ -504,6 +541,7 @@ class FacturationController extends AbstractActionController {
 		
 		$id_patient = ( int ) $this->params ()->fromPost ( 'id_patient', 0 );
 		$diagnostic = $this->params ()->fromPost ( 'diagnostic' );
+		$precision_diagnostic = $this->params ()->fromPost ( 'precision_diagnostic' );
 		$intervention_prevue = $this->params ()->fromPost ( 'intervention_prevue' );
 		$vpa = $this->params ()->fromPost ( 'vpa' );
 		$salle = $this->params ()->fromPost ( 'salle' );
@@ -512,6 +550,7 @@ class FacturationController extends AbstractActionController {
 		$donnees = array (
 				'id_patient' => $id_patient,
 				'diagnostic' => $diagnostic,
+				'precision_diagnostic' => $precision_diagnostic,
 				'intervention_prevue' => $intervention_prevue,
 				'vpa' => $vpa,
 				'salle' => $salle,
@@ -692,6 +731,9 @@ class FacturationController extends AbstractActionController {
 		//INSTANCIATION DU FORMULAIRE D'ADMISSION
 		$formAdmission = new AdmissionBlocForm();
 		
+		//$InfoAdmis = $this->getAdmissionTable()->getPatientAdmisBloc(1936);
+		//var_dump($InfoAdmis); exit();
+		
 		$this->layout ()->setTemplate ( 'layout/facturation' );
 		//INSTANCIATION DU FORMULAIRE
 		$service = $this->getServiceTable ()->fetchService ();
@@ -777,6 +819,7 @@ class FacturationController extends AbstractActionController {
 		$datetime = $this->convertDate ($InfoAdmis['date']).' - '.$InfoAdmis['heure'];
 		
 		$html .= "<script> $('#diagnostic').val('".str_replace("'", "\'",$InfoAdmis['diagnostic'])."');";
+		$html .= "$('#precision_diagnostic').val('".str_replace("'", "\'",$InfoAdmis['precision_diagnostic'])."');";
 		$html .= "$('#id_admission').val('".str_replace("'", "\'",$InfoAdmis['id_admission'])."');";
 		$html .= "$('#intervention_prevue').val('".str_replace("'", "\'",$InfoAdmis['intervention_prevue'])."');";
 		$html .= "$('#vpa').val('".str_replace("'", "\'",$InfoAdmis['vpa'])."');";

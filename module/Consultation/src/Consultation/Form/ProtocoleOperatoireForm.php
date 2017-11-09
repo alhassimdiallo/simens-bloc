@@ -82,7 +82,7 @@ class ProtocoleOperatoireForm extends Form{
 				'attributes' => array (
 						'id' => 'protocole_operatoire',
 						'required' => true,
-						'maxlength' => 1500,
+						'maxlength' => 5000,
     				    'tabindex' => 4,
 				)
 		) );
@@ -95,7 +95,7 @@ class ProtocoleOperatoireForm extends Form{
 				),
 				'attributes' => array (
 						'id' => 'soins_post_operatoire',
-						'maxlength' => 400,
+						'maxlength' => 2500,
 						'required' => true,
     				    'tabindex' => 5,
 				)
@@ -138,7 +138,7 @@ class ProtocoleOperatoireForm extends Form{
 		    ),
 		    'attributes' => array (
 		        'id' => 'complications',
-		        'maxlength' => 350,
+		        'maxlength' => 2500,
 		        'tabindex' => 5,
 		    )
 		) );

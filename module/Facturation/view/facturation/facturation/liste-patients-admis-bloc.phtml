@@ -112,7 +112,10 @@ $(window).load(function () {
 		       <div style='width: 77%; float:left;'>
 		         <table id="form_patient" style="width:100%;">
 		             <tr id="form_patient_radio" style='width: 100%;'>
-		                 <td style='width: 33%;' class="comment-form-patient"><?php echo $this->formRow($form->get('diagnostic'));?></td>
+		                 <td style='width: 33%;' class="label-form-diagnostic">
+		                    <?php echo $this->formRow($form->get('diagnostic'));?>
+		                    <?php echo $this->formRow($form->get('precision_diagnostic'));?>
+		                 </td>
 		                 <td style='width: 33%;' class="comment-form-patient"><?php echo $this->formRow($form->get('intervention_prevue'));?></td>
 		                 <td style='width: 33%;' class="comment-form-patient"><span id="urgenceSelect" style="float: right; margin-right: 20px; font-family: time new romans;"> Urgence <input name="urgenceCheckbox" style="position: relative; float: right; margin-left: 10px;" type="checkbox"></span><?php echo $this->formRow($form->get('vpa'));?></td>
 		             </tr>

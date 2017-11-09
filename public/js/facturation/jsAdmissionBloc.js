@@ -117,6 +117,17 @@ function initialisation(){
 
 }
 
+function appelScriptAutoCompletionDiagnostic(){
+    $.ajax({
+        type: 'POST',
+        url: tabUrl[0]+'public/facturation/get-liste-diagnostic-bloc',
+        data:null,
+        success: function(data) {    
+        	var result = jQuery.parseJSON(data);   
+        	$('#scriptAutocompletionDiagnostic').html(result);
+        }
+    });
+}
 
 function clickRowHandler() 
 {

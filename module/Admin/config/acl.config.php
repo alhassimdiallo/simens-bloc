@@ -181,6 +181,7 @@ return array(
     								
     								'infos-stat-imprime' => array('major', 'medecin', 'superAdmin'),
     								'creation-image' => array('major', 'medecin', 'superAdmin'),
+    								'get-liste-diagnostic-bloc' => array('major', 'medecin', 'superAdmin'),
     						),
     						
     						
@@ -271,7 +272,7 @@ return array(
     						        'ajouter-mp3-protocole' => array('medecin', 'superAdmin'),
     						        'inserer-bd-mp3-protocole' => array('medecin', 'superAdmin'),
     						        'supprimer-mp3-protocole' => array('medecin', 'superAdmin'),
-    								
+    								'imprimer-compte-rendu-operatoire' => array('medecin', 'superAdmin'),
     								
     								
     								

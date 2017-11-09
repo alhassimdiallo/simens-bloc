@@ -50,8 +50,6 @@ use Consultation\Form\ProtocoleOperatoireForm;
 use Consultation\View\Helpers\CompteRenduOperatoirePdf;
 use Consultation\View\Helpers\CompteRenduOperatoirePage2Pdf;
 use Zend\XmlRpc\Value\String;
-use Consultation\View\Helpers\fpdf181;
-use Consultation\View\Helpers\fpdf181\fpdf;
 use Consultation\View\Helpers\fpdf181\PDF;
 
 class ConsultationController extends AbstractActionController {
@@ -5622,11 +5620,12 @@ class ConsultationController extends AbstractActionController {
 		$this->layout()->setTemplate('layout/consultation');
 		$user = $this->layout()->user;
 		$prenomNom = $user['Prenom'].' '.$user['Nom'];
+		$idMedecin = $user['id_employe'];
 		
 		$formPO = new ProtocoleOperatoireForm();
 		
-		$listeProtocolePO = $this->getAdmissionTable()->getListeProtocoleOperatoireBloc();
-		$listeProtocoleSOP = $this->getAdmissionTable()->getListeSoinsPostOperatoireBloc();
+		$listeProtocolePO = $this->getAdmissionTable()->getListeProtocoleOperatoireBloc($idMedecin);
+		$listeProtocoleSOP = $this->getAdmissionTable()->getListeSoinsPostOperatoireBloc($idMedecin);
 		$listeIndicationPO = $this->getAdmissionTable()->getListeIndicationPOBloc();
 		$listeTypeAnesthesiePO = $this->getAdmissionTable()->getListeTypeAnesthesiePOBloc();
 		
@@ -5764,7 +5763,7 @@ class ConsultationController extends AbstractActionController {
  		
 		$visitePA .= '<table style="width: 100%;">';
 		$visitePA .='<tr style="width: 100%; ">';
- 		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['diagnostic']).' </p></td>';
+ 		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['diagnostic']).' '.str_replace("'", "\'",$InfoAdmis['precision_diagnostic']).' </p></td>';
  		$visitePA .='<td style="width: 30%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Intervention pr&eacute;vue</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['intervention_prevue']).' </p></td>';
  		$visitePA .='<td style="width: 20%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">VPA</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['vpa']).' </p></td>';
  		$visitePA .='<td style="width: 15%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Salle</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['salle']).' </p></td>';
@@ -5894,6 +5893,98 @@ class ConsultationController extends AbstractActionController {
 		//Afficher le document contenant la page
 		$DocPdf->getDocument();
 	}
+	
+	
+	//Utilisation du plugin fpdf --- Utilisation du plugin fpdf
+	//Utilisation du plugin fpdf --- Utilisation du plugin fpdf 
+	//Utilisation du plugin fpdf --- Utilisation du plugin fpdf
+	public function imprimerCompteRenduOperatoireAction(){
+	
+		$control = new DateHelper();
+	
+		$user = $this->layout()->user;
+		$serviceMedecin = $user['NomService'];
+	
+		$nomMedecin = $user['Nom'];
+		$prenomMedecin = $user['Prenom'];
+		$donneesMedecin = array('nomMedecin' => $nomMedecin, 'prenomMedecin' => $prenomMedecin);
+	
+		$id_patient = $this->params ()->fromPost ( 'id_patient', 0 );
+		$infosPatient = $this->getConsultationTable()->getInfoPatient($id_patient);
+	
+		$id_admission = $this->params ()->fromPost ( 'id_admission', 0 );
+		$InfoAdmission = $this->getAdmissionTable()->getPatientAdmisBloc($id_admission);
+	
+		
+		//Récupération des données des infos de l'en-tête
+		//Récupération des données des infos de l'en-tête
+		//Récupération des données des infos de l'en-tête
+		$InfosEnTete = array();
+		
+		$InfosEnTete['id_patient'] = $id_patient;
+		$InfosEnTete['service'] = $serviceMedecin;
+		$InfosEnTete['salle'] = $InfoAdmission['salle'];
+		$InfosEnTete['anesthesiste'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost ( 'anesthesiste' ) );
+		$InfosEnTete['check_list_securite'] = $this->params ()->fromPost ( 'check_list_securite' );
+		$InfosEnTete['aides_operateurs'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost ( 'aides_operateurs' ));
+		$InfosEnTete['infosNomPrenomOperateur'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost ( 'infoNomPrenomOperateur' ) );
+		$InfosEnTete['dateIntervention'] = $control->getDateInDateTimeDHM( $this->params ()->fromPost ( 'calendrierDateIntervention' ) );
+		if(strlen($InfosEnTete['dateIntervention']) < 10){
+			$InfosEnTete['dateIntervention'] =  (new \DateTime ())->format ( 'd/m/Y' );
+		}
+		
+		
+		//Récupération des données du compte rendu opératoire
+		//Récupération des données du compte rendu opératoire
+		//Récupération des données du compte rendu opératoire
+		$tabInformations = array();
+		
+		$tabInformations[0]['titre'] = "Diagnostic";
+		$tabInformations[0]['type' ] = 1;
+		$tabInformations[0]['texte'] = iconv ('UTF-8' , 'windows-1252', $InfoAdmission['diagnostic'].' '.$InfoAdmission['precision_diagnostic']);
+		
+		$tabInformations[1]['titre'] = "Indication";
+		$tabInformations[1]['type' ] = 1;
+		$tabInformations[1]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost (  'indication' ));
+
+		$tabInformations[2]['titre'] = iconv ('UTF-8' , 'windows-1252', "Intervention prévue");
+		$tabInformations[2]['type' ] = 1;
+		$tabInformations[2]['texte'] = iconv ('UTF-8' , 'windows-1252', $InfoAdmission['intervention_prevue']);
+		
+		$tabInformations[3]['titre'] = iconv ('UTF-8' , 'windows-1252', "Type d'anesthésie");
+		$tabInformations[3]['type' ] = 1;
+		$tabInformations[3]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost (  'type_anesthesie' ));
+		
+		$tabInformations[4]['titre'] = iconv ('UTF-8' , 'windows-1252', "N° VPA");
+		$tabInformations[4]['type' ] = 1;
+		$tabInformations[4]['texte'] = iconv ('UTF-8' , 'windows-1252', $InfoAdmission['vpa']);
+		
+		$tabInformations[5]['titre'] = iconv ('UTF-8' , 'windows-1252', "Protocole opératoire");
+		$tabInformations[5]['type' ] = 2;
+		$tabInformations[5]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params()->fromPost('protocole_operatoire'));
+		
+		$tabInformations[6]['titre'] = "Complication";
+		$tabInformations[6]['type' ] = 2;
+		$tabInformations[6]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params()->fromPost('complications'));
+		
+		$tabInformations[7]['titre'] = iconv ('UTF-8' , 'windows-1252', "Soins post-opératoire");
+		$tabInformations[7]['type' ] = 2;
+		$tabInformations[7]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params()->fromPost('soins_post_operatoire'));
+		
+		
+		$pdf = new PDF();
+		$pdf->SetMargins(13.5,13.5,13.5);
+		
+		$pdf->setInfosPatients($infosPatient);
+		$pdf->setTabInformations($tabInformations);
+		$pdf->setInfosEnTete($InfosEnTete);
+		
+		$pdf->ImpressionCompteRenduOperatoire();
+		$pdf->Output('I');
+		
+		
+	}
+	
 	
 	public function enregistrerProtocoleOperatoireAction(){
 		
@@ -7206,46 +7297,7 @@ class ConsultationController extends AbstractActionController {
 	
 	
 	
-	//Test du plugin fpdf181  --- Test du plugin fpdf181 --- Test du plugin fpdf181 --- 
-	//Test du plugin fpdf181  --- Test du plugin fpdf181 --- Test du plugin fpdf181 --- 
-	protected $txt = "
-				Aujourd’hui, les technologies de l’information et de la communication (TIC) sont présentes partout. Elles sont dans les secteurs comme les grandes distributions ainsi que les secteurs privés et publics en général. Le secteur de la santé est aujourd’hui sans doute l’un des domaines où les TIC ont eu des avancées très importantes.
-				";
 	
-	public function fpdfDocumentAction()
-	{
-		$pdf = new PDF();
-		$pdf->SetMargins(13.5,13.5,13.5);
-		
-// 		$titre =  iconv ('UTF-8' ,'ISO-8859-1//TRANSLIT' ,"Vingt mille é ' ’ où œ lieues sous les mers");
- 		$titreTxt = iconv ('UTF-8' ,null ,"UN  éCUEIL FUYANT");
-		$txt = iconv ('UTF-8' ,null, "Aujourd'hui,  œ afficher  les technologies 
-- de l’information et de la communication (TIC) 
-- <B> sont présentes partout. Elles sont dans les secteurs comme les grandes distributions ainsi que les secteurs privés et publics en général. Le secteur de la santé est aujourd’hui sans doute l’un des domaines où les TIC ont eu des avancées très importantes.
-				");
-		
-		
-		
-		$txt2 = iconv ('UTF-8' ,null, "Aujourd'hui,  œ afficher  les technologies
-- de l’information et de la communication (TIC)
-				");
-		
-		//$txt = iconv ('UTF-8' ,null , $txt);
-		//var_dump(mb_detect_encoding($titre)); exit();
-		//var_dump(iconv ('UTF-8' ,null , $txt)); exit();
-		//var_dump(mb_detect_encoding(iconv ('UTF-8' ,null , $txt))); exit();
-		
-		//var_dump(iconv_get_encoding()); exit();
-		
-		$pdf->setTxt( $txt );
-		$pdf->setTxt2( $txt2 );
-		
-		//$pdf->SetTitle($titre);
-		//$pdf->SetAuthor('Jules Verne');
-		$pdf->AjouterText(1,$titreTxt);
-		//$pdf->AjouterChapitre(2,'LE POUR ET LE CONTRE','20k_c2.txt');
-		$pdf->Output('I');
-	}
 	
 	
 }

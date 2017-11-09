@@ -52,12 +52,14 @@
     
     
     var diagnostic = "";
+    var precision_diagnostic = "";
 	var intervention_prevue = "";
 	var vpa = "";
 	var salle = "";
 	var operateur = "";
 	
     var diagnostic2 = "";
+    var precision_diagnostic2 = "";
 	var intervention_prevue2 = "";
 	var vpa2 = "";
 	var salle2 = "";
@@ -65,6 +67,7 @@
 	
 	function valeursChamps(){
 	    diagnostic2 = $('#diagnostic').val();
+	    precision_diagnostic2 = $('#precision_diagnostic').val();
 		intervention_prevue2 = $('#intervention_prevue').val();
 		vpa2 = $('#vpa').val();
 		salle2 = $('#salle').val();
@@ -94,7 +97,7 @@
             	    		 valeursChamps(); 
             	    		 
             	    		 if(
-            	    				 diagnostic != diagnostic2 || intervention_prevue != intervention_prevue2 || 
+            	    				 diagnostic != diagnostic2 || precision_diagnostic != precision_diagnostic2 || intervention_prevue != intervention_prevue2 || 
             	    				 vpa != vpa2 || salle != salle2 || operateur != operateur2 
             	    		 ){
             	    			 return true;
@@ -211,6 +214,7 @@
     
     function desactiverChampsInit(){
     	$('#diagnostic').attr('readonly', true);
+    	$('#precision_diagnostic').attr('readonly', true);
     	$('#intervention_prevue').attr('readonly', true);
     	$('#vpa').attr('readonly', true);
     	$('#salle').attr('readonly', true);
@@ -218,6 +222,7 @@
     	$('#service').attr('disabled', true);
     	
     	diagnostic = $('#diagnostic').val();
+    	precision_diagnostic = $('#precision_diagnostic').val();
     	intervention_prevue = $('#intervention_prevue').val();
     	vpa = $('#vpa').val();
     	salle = $('#salle').val();
@@ -226,6 +231,7 @@
     
     function desactiverChamps(){
     	$('#diagnostic').attr('readonly', true);
+    	$('#precision_diagnostic').attr('readonly', true);
     	$('#intervention_prevue').attr('readonly', true);
     	$('#vpa').attr('readonly', true);
     	$('#salle').attr('readonly', true);
@@ -234,6 +240,7 @@
 
     function activerChamps(){
     	$('#diagnostic').attr('readonly', false);
+    	$('#precision_diagnostic').attr('readonly', false);
     	$('#intervention_prevue').attr('readonly', false);
     	$('#vpa').attr('readonly', false);
     	$('#salle').attr('readonly', false);

@@ -305,7 +305,8 @@
     	var infoNomPrenomOperateur = $('#infoNomPrenomOperateur').val();
     	
     	
-    	var vart =  tabUrl[0]+'public/consultation/imprimer-protocole-operatoire';
+    	//var vart =  tabUrl[0]+'public/consultation/imprimer-protocole-operatoire';
+    	var vart =  tabUrl[0]+'public/consultation/imprimer-compte-rendu-operatoire';
 		var FormulaireImprimerProtocoleOperatoire = document.getElementById("FormulaireImprimerProtocoleOperatoire");
 		FormulaireImprimerProtocoleOperatoire.setAttribute("action", vart);
 		FormulaireImprimerProtocoleOperatoire.setAttribute("method", "POST");

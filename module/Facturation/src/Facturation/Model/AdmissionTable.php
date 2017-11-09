@@ -181,23 +181,23 @@ class AdmissionTable {
 		return $requete->execute()->current();
 	}
 	
-	public function getListeProtocoleOperatoireBloc(){
+	public function getListeProtocoleOperatoireBloc($idMedecin){
 	    $db = $this->tableGateway->getAdapter();
 	    $sql = new Sql($db);
 	    $sQuery = $sql->select('protocole_operatoire_bloc')
 	    ->group("protocole_operatoire")
-	    ->where(array("id_protocole < ?" => 100));
+	    ->where(array("id_employe" => $idMedecin));
 	    
 	    $requete = $sql->prepareStatementForSqlObject($sQuery);
 	    return $requete->execute();
 	}
 	
-	public function getListeSoinsPostOperatoireBloc(){
+	public function getListeSoinsPostOperatoireBloc($idMedecin){
 	    $db = $this->tableGateway->getAdapter();
 	    $sql = new Sql($db);
 	    $sQuery = $sql->select('protocole_operatoire_bloc')
 	    ->group("soins_post_operatoire")
-	    ->where(array("id_protocole < ?" => 100));
+	    ->where(array("id_employe" => $idMedecin));
 	     
 	    $requete = $sql->prepareStatementForSqlObject($sQuery);
 	    return $requete->execute();
