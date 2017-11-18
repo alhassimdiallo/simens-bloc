@@ -309,7 +309,7 @@ $(window).load(function () {
 		             </tr>
 		             
 		             <tr style='width: 100%;'>
-		                 <td colspan="3" class="comment-form-choix" style='width: 100%;' ><?php echo $this->formRow($form->get('diagnostic'));?></td>
+		                 <td colspan="3" class="comment-form-choix" style='width: 100%;' ><?php /*echo $this->formRow($form->get('diagnostic')); */ ?></td>
 		             </tr>
 		             
 		           </table>
@@ -397,6 +397,117 @@ $(window).load(function () {
 
 
 
+<!-- LA TROISIEME PAGE POUR INFOS 3 -->
+<!-- LA TROISIEME PAGE POUR INFOS 3 -->
+<!-- LA TROISIEME PAGE POUR INFOS 3 -->
+<div id="contenuPageC" >
+
+    <table style="width: 100%; height: 20%;">
+	 <tr style="background: white; width: 100%;"><td colspan="2"> <img id="retourPageCMenuInfos" style="width: 16px;position: absolute; height: 16px; float: left; cursor: pointer; " src='../images_icons/72.png' > </td></tr>
+	 <tr id="interfaceStatInformationOptionnelle" style="width: 100%; height: 20%; background: white;">
+	 
+	   <!-- PREMIERE COLONNE -->
+	   <!-- PREMIERE COLONNE -->
+	   <td  style="width: 35%; height: 20%; vertical-align: top;" >
+	     <table style="width: 100%; ">
+	       
+	       <tr style="width: 100%; ">
+	         <td style="width: 100%; height: 20px; font-family: Consolas; font-weight: bold; font-size: 17px; text-align: center;">
+	         </td>
+	       </tr>
+	       
+	       <tr style="width: 100%; ">
+	         <td style="width: 100%; height: 40px; background: yello; font-family: Consolas; font-weight: bold; font-size: 17px; text-align: center;">
+	          
+	             <?php $form = $this->formStatistique ;
+		               $form->prepare();
+		               echo $this->form()->openTag($form);
+		         ?>
+		         
+		         <div align="center" style='width: 100%; background: re;'>
+		           <form>
+		           <table id="form_choix" style="width:95%;">
+		             <tr style='width: 100%;'>
+		                 <td colspan="3" class="comment-form-choix" style='width: 100%;'><?php echo $this->formRow($form->get('id_service_rapport'));?></td>
+		             </tr>
+		         
+ 		             <tr style='width: 100%;'>
+		                 <td class="comment-form-choix" style='width: 46%;'><?php echo $this->formRow($form->get('date_debut_rapport'));?></td>
+		                 <td class="comment-form-choix" style='width: 46%;'><?php echo $this->formRow($form->get('date_fin_rapport'));?> </td>
+		                 <td style='width: 8%;' class="boutonAfficherInfosInervalleDateIntervention" > <img onclick="getInformationsDatedebutDatefinRapport();" style="cursor: pointer; width: 32px; height: 32px; padding-top: 25px;" src='../images_icons/right_32.png'  title="Visualiser"> </td>
+		             </tr>
+		             
+		             <tr style='width: 100%;'>
+		                 <td colspan="3" class="comment-form-choix" style='width: 100%;' ><?php echo $this->formRow($form->get('diagnostic_rapport'));?></td>
+		             </tr>
+		             
+		           </table>
+		           <button style="display: none;" id="ValidationInformation"> </button>
+		           </form>
+		         </div>
+
+                 <?php echo $this->form()->closeTag(); ?>
+                 
+	         </td>
+	       </tr>
+	       
+	     </table> 
+	   </td>
+
+	   <!-- DEUXIEME COLONNE -->
+   	   <!-- DEUXIEME COLONNE -->
+	   <td id="resultatOptionsChoisis" style="width: 65%; height: 20%; border-left: 3px solid #cccccc; vertical-align: top;" >
+	     <table id="resultatOptionChoisiParDefaut" style="width: 100%; background: white;">
+	     
+	       <tr id="titreResultatRapportOptionChoisi"  style="width: 100%; ">
+	         <td style="width: 100%; height: 20px; font-family: Consolas; font-weight: bold; font-size: 17px; text-align: center;">
+                 <div  style="width: 100%; overflow: auto; margin-left: 15px; height: 25px; margin-left: 15px; background: yello;" >
+                       <span> Rapport </span> <img onclick="imprimerRapportStatistique();" style="width: 24px; height: 24px; float: right; cursor: pointer;" src='../images_icons/pdf.png' />
+                 </div>
+	         </td>
+	       </tr>
+	       
+	       <tr id="tableauResultatRapportOptionChoisi" style="width: 100%;">
+	         <td align="center" style="width: 100%; height: 200px; font-family: Consolas; font-weight: bold; font-size: 17px; text-align: center; vertical-align: top;">
+	             <div class="contenuTableauResultatOptionChoisi" align="center" style="width: 100%; margin-left: 15px; margin-top: 5px; margin-bottom: 15px; min-height: 50px; " >
+	              
+	              <!-- Emplacement des infos statistiques -->
+	              
+	             </div> 
+	         </td>
+	       </tr>
+	     
+	     </table> 
+	   </td>
+	     
+	     
+	 </tr>
+	 
+	</table> 
+
+	<div style="display: none;">
+       <form id="imprimerRapportInformationsStatistiques"> <button></button> </form>
+    </div>
+</div>
+	       
+
+
+
+
+	       
+	       
+	       
+	       
+	       
+	       
+	       
+	       
+	       
+	       
+	       
+	       
+
+
 <div id="menuGeneral">
 
   <table style="width: 100%;">
@@ -439,13 +550,13 @@ $(window).load(function () {
       
       <td style="width: 25%;" >
       
-            <div style='width: 90%; margin: auto;'>
+            <div id="menuOption3" style='width: 90%; margin: auto;'>
 		      <table style="width: 100%; border-radius: 50%;">
 		          <tr style="border-radius: 50%; height: 120px;">
 		             <th style="border-radius: 50%; ">
 		               <div>
 		                 <section>
-		                   <img src='../images_icons/Table16X16.png' > INFOS 3 - <span style="color: red;"> No</span>
+		                   <img src='../images_icons/excel-et-numbers-un-tableur-tableau-icone2.png' > RAPPORT STAT. 
 		                 </section>
 		               </div>
 		             </th>
@@ -513,7 +624,7 @@ $(window).load(function () {
 </div>
 
 <script>
-setTimeout(function(){ $('#contenuPageA, #contenuPageB, #visualiserResultatParAge, #visualiserResultatParDateIntervention').toggle(false); });
+setTimeout(function(){ $('#contenuPageA, #contenuPageB,  #contenuPageC, #visualiserResultatParAge, #visualiserResultatParDateIntervention, .boutonAfficherInfosInervalleDateIntervention img').toggle(false); });
 
 //INITIALISER LES SCRIPTS
 initialisation();

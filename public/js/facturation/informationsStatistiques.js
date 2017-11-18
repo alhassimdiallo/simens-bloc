@@ -3,6 +3,7 @@ var tabUrl = base_url.split("public");
 	
 var saveStatOption1 = 0;
 var saveStatOption2 = 0;
+var saveStatOption3 = 0;
 
 function initialisation (){
 	$('#id_medecin, #age_min, #age_max').attr('disabled', true);
@@ -67,6 +68,52 @@ function initialisation (){
 				$('#menuGeneral').fadeIn();
 				$('#iconeInfosPremiereIntervention').css({'visibility' : 'hidden'});
 			});
+		}
+	});
+	
+	
+	//GESTION DE LA PAGE INFOS 3
+	//GESTION DE LA PAGE INFOS 3
+	$('#menuOption3').click(function(){
+		$('#menuGeneral').fadeOut(function(){
+			$('#menu_infos').html('INFOS STATISTIQUES - GENERER DES RAPPORTS');
+			$('#contenuPageC').fadeIn();
+			$('#iconeInfosPremiereIntervention').css({'visibility' : 'visible'});
+		});
+	});
+	
+	$('#retourPageCMenuInfos').click(function(){
+		if(saveStatOption3 == 1){
+			vart = tabUrl[0]+'public/facturation/informations-statistiques';
+		    $(location).attr("href",vart);
+		}else{
+			$('#contenuPageC').fadeOut(function(){
+				$('#menu_infos').html('MENU INFOS');
+				$('#menuGeneral').fadeIn();
+				$('#iconeInfosPremiereIntervention').css({'visibility' : 'hidden'});
+			});
+		}
+	});
+
+
+	infosStatistiquesRapport();
+	$('#date_debut_rapport, #date_fin_rapport').change(function(){
+		var date_debut_rapport = $('#date_debut_rapport').val();
+		var date_fin_rapport = $('#date_fin_rapport').val();
+		
+		if(date_debut_rapport && date_fin_rapport){
+			$('.boutonAfficherInfosInervalleDateIntervention img').toggle(true);
+		}else{
+			$('.boutonAfficherInfosInervalleDateIntervention img').toggle(false);
+		}
+	}).keyup(function(){
+		var date_debut_rapport = $('#date_debut_rapport').val();
+		var date_fin_rapport = $('#date_fin_rapport').val();
+		
+		if(date_debut_rapport && date_fin_rapport){
+			$('.boutonAfficherInfosInervalleDateIntervention img').toggle(true);
+		}else{
+			$('.boutonAfficherInfosInervalleDateIntervention img').toggle(false);
 		}
 	});
 
@@ -952,5 +999,182 @@ function captureImageStatOptionnelleLancer(){
  			});
 		}
 	});
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//GESTION DES STATISTIQUES DES RAPPORTS A GENERER
+//GESTION DES STATISTIQUES DES RAPPORTS A GENERER
+//GESTION DES STATISTIQUES DES RAPPORTS A GENERER
+function infosStatistiquesRapport(){
+	$.ajax({
+		url: tabUrl[0]+"public/facturation/get-tableau-statistiques-diagnostics-bloc",
+		type: 'post',
+		data: null,
+		success: function( data ) {
+			var resultat = jQuery.parseJSON(data);
+			$('#tableauResultatRapportOptionChoisi div').html(resultat);
+		}
+	});
+}
+
+//Afficger les informations lors de la selection d'un service
+//Afficger les informations lors de la selection d'un service
+function getInformationsServiceRapport(id_service){
+
+	$('#listeTableauInfosStatistiques').html('<table> <tr> <td style="padding-top: 50px;"> Chargement </td> </tr>  <tr> <td align="center" style="padding-bottom: 40px;"> <img style="margin-top: 20px; width: 70px; height: 70px;" src="../images/loading/Chargement_1.gif" /> </td> </tr> </table>');
+	
+	if(id_service == 0){
+		infosStatistiquesRapport();
+		$('#id_service_rapport').val(0);
+		$('#date_debut_rapport, #date_fin_rapport').val('').trigger('keyup');
+		$('#diagnostic_rapport').val(0);
+	}
+	else{ 
+		$.ajax({
+			url: tabUrl[0]+"public/facturation/get-tableau-statistiques-diagnostics-par-service-bloc",
+			type: 'post',
+			data: {'id_service':id_service},
+			success: function( data ) {
+				var resultat = jQuery.parseJSON(data);
+				$('#tableauResultatRapportOptionChoisi div').html(resultat);
+				
+				$('#date_debut_rapport, #date_fin_rapport').val('').trigger('keyup');
+				$('#diagnostic_rapport').val(0);
+			}
+		});
+	}
+}
+
+//Afficher les informations lors de la saisie d'une date_debut et date_fin
+//Afficher les informations lors de la saisie d'une date_debut et date_fin
+function getInformationsDatedebutDatefinRapport(){
+	var id_servive_rapport = $('#id_service_rapport').val();
+	var date_debut_rapport = $('#date_debut_rapport').val();
+	var date_fin_rapport = $('#date_fin_rapport').val();
+	
+	if(date_debut_rapport && date_fin_rapport){
+		$('#listeTableauInfosStatistiques').html('<table> <tr> <td style="padding-top: 10px;"> Chargement </td> </tr>  <tr> <td align="center" style="padding-bottom: 40px;"> <img style="margin-top: 20px; width: 70px; height: 70px;" src="../images/loading/Chargement_1.gif" /> </td> </tr> </table>');
+		$.ajax({
+			url: tabUrl[0]+"public/facturation/get-tableau-statistiques-diagnostics-par-service-par-periode-bloc",
+			type: 'post',
+			data: {'id_service' : id_servive_rapport, 'date_debut' : date_debut_rapport, 'date_fin' : date_fin_rapport},
+			success: function( data ) {
+				var resultat = jQuery.parseJSON(data); 
+				$('#titreResultatRapportOptionChoisi div span').html(resultat[1]);
+				$('#tableauResultatRapportOptionChoisi div').html(resultat[0]);
+				
+				$('#diagnostic_rapport').val(0);
+			}
+		});
+	
+	}
+}
+
+//Afficher les informations lors de la selection d'un diagnostic
+//Afficher les informations lors de la selection d'un diagnostic
+function getListeDiagnosticRapport(id_diagnostic){
+	
+	var id_servive_rapport = $('#id_service_rapport').val();
+	var date_debut_rapport = $('#date_debut_rapport').val();
+	var date_fin_rapport = $('#date_fin_rapport').val();
+	
+	if(id_diagnostic == 0){
+		if(date_debut_rapport && date_fin_rapport){
+			getInformationsDatedebutDatefinRapport();
+		}else{
+			getInformationsServiceRapport(id_servive_rapport);	
+		}
+	}else{
+	
+		$('#listeTableauInfosStatistiques').html('<table> <tr> <td style="padding-top: 10px;"> Chargement </td> </tr>  <tr> <td align="center" style="padding-bottom: 40px;"> <img style="margin-top: 20px; width: 70px; height: 70px;" src="../images/loading/Chargement_1.gif" /> </td> </tr> </table>');
+		$.ajax({
+			url: tabUrl[0]+"public/facturation/get-tableau-statistiques-diagnostics-par-service-par-periode-par-diagnostic-bloc",
+			type: 'post',
+			data: $(this).serialize(),  
+			data: {'id_diagnostic' : id_diagnostic , 'id_service' : id_servive_rapport, 'date_debut' : date_debut_rapport, 'date_fin' : date_fin_rapport},
+			success: function( data ) {
+				var resultat = jQuery.parseJSON(data); 
+				$('#titreResultatRapportOptionChoisi div span').html(resultat[1]);
+				$('#tableauResultatRapportOptionChoisi div').html(resultat[0]);
+			}
+		});
+
+	}
+}
+
+//Imprimer les rapports des diagnostics des intervention
+//Imprimer les rapports des diagnostics des intervention
+function imprimerRapportStatistique(){
+	var id_service = $('#id_service_rapport').val();
+	var date_debut = $('#date_debut_rapport').val();
+	var date_fin = $('#date_fin_rapport').val();
+	var id_diagnostic = $('#diagnostic_rapport').val();
+	
+	var lienImpression =  tabUrl[0]+'public/facturation/imprimer-rapport-des-diagnostics-des-interventions';
+	var imprimerInformationsStatistiques = document.getElementById("imprimerRapportInformationsStatistiques");
+	imprimerInformationsStatistiques.setAttribute("action", lienImpression);
+	imprimerInformationsStatistiques.setAttribute("method", "POST");
+	imprimerInformationsStatistiques.setAttribute("target", "_blank");
+	
+	// Ajout dynamique de champs dans le formulaire
+	var champ = document.createElement("input");
+	champ.setAttribute("type", "hidden");
+	champ.setAttribute("name", 'date_debut');
+	champ.setAttribute("value", date_debut);
+	imprimerInformationsStatistiques.appendChild(champ);
+	
+	var champ2 = document.createElement("input");
+	champ2.setAttribute("type", "hidden");
+	champ2.setAttribute("name", 'date_fin');
+	champ2.setAttribute("value", date_fin);
+	imprimerInformationsStatistiques.appendChild(champ2);
+	
+	var champ3 = document.createElement("input");
+	champ3.setAttribute("type", "hidden");
+	champ3.setAttribute("name", 'id_diagnostic');
+	champ3.setAttribute("value", id_diagnostic);
+	imprimerInformationsStatistiques.appendChild(champ3);
+	
+	var champ4 = document.createElement("input");
+	champ4.setAttribute("type", "hidden");
+	champ4.setAttribute("name", 'id_service');
+	champ4.setAttribute("value", id_service);
+	imprimerInformationsStatistiques.appendChild(champ4);
+
+	$("#imprimerRapportInformationsStatistiques button").trigger('click');
 	
 }

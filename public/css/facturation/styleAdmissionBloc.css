@@ -518,7 +518,6 @@ font-family: Goudy Old Style;
    background-color:#eee;
    font-size: 13pt;
    overflow: auto;
-
 }
 
 #form_patient input[type="text"], #form_patient textarea
@@ -604,7 +603,7 @@ padding-bottom: 5px;
 
 margin-bottom : 15px;
 
-margin-right: 25px;
+margin-right: 20px;
 
 padding-left: 10px; /* padding du text dans le champ*/
 
@@ -902,7 +901,7 @@ z-index: 1;
 
 
 .label-form-diagnostic label{
-line-height: 0.8em;
+line-height: 1.2em;
 
 background-color: #eeeeee;
 
@@ -954,4 +953,218 @@ font-family: Goudy Old Style;
 .label-form-diagnostic input[type='text']
 {
 	margin-top: -12px;
+	width: 98%;
+}
+
+.label-form-diagnostic select
+{
+	margin-top: -12px;
+	width: 98%;
+}
+
+#titre_info_deces_prolonger{
+	font-style: italic;
+    font-family: Times  New Roman;
+    font-size: 18px;
+    color: green;
+    margin-top: 180px;
+    margin-left: 4%; /*18%*/
+}
+
+#barre_separateur_prolonger{
+    border-bottom: 2px solid #ccc;
+    margin-top: 3px;
+    margin-left: 4%; /*18%*/
+}
+
+.iconeAjouterDiag{
+	margin-left: 8px;
+	cursor: pointer;
+}
+
+.iconeAnnulerDiag{
+	cursor: pointer;
+}
+
+.contenu-form-diagnostic{
+	max-height: 180px;
+	height: 180px;
+	overflow-y: auto; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.iconeAjouterAdmissionDiagnostic{
+	cursor: pointer;
+	margin-left: 40%;
+}
+
+#ajouterDesDiagnostics .interfaceAjoutDesDiagnostics, #ajouterDesDiagnostics .interfaceAjoutDesDiagnostics tr{
+	width: 100%; 
+}
+
+#ajouterDesDiagnostics .interfaceAjoutDesDiagnostics td{
+	width: 50%; 
+	margin-left: 5px;
+}
+
+#ajouterDesDiagnostics .interfaceAjoutDesDiagnostics td label{
+	width: 50%;
+	height: 25px;
+	font-size: 20px;
+	font-family: times new roman;
+	text-align: left;
+}
+
+#ajouterDesDiagnostics .interfaceAjoutDesDiagnostics td div{
+	width: 96%;
+	height: 300px;
+	font-size: 17px;
+	font-family: times new roman;
+	border: 1px solid #cccccc;
+    background : #fdfdfd;
+    box-shadow: 0pt 0pt 5px rgba(0, 0, 0, 0.3);
+	margin-bottom: 5px;
+	overflow-y: auto;
+}
+
+#ajouterDesDiagnostics .listeDesDiagnosticsExistants table, #ajouterDesDiagnostics .listeDesDiagnosticsExistants table tr{
+	width: 100%;
+}
+
+#ajouterDesDiagnostics .listeDesDiagnosticsExistants table td{
+	padding-left: 6px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border: 1px solid #cccccc;
+}
+
+#ajouterDesDiagnostics .listeDesDiagnosticsExistants table td:hover{
+	background: #e5e5e5; 
+}
+
+#ajouterDesDiagnostics .listeDesDiagnosticsExistants table .LTPE1{
+	width: 1%;
+}
+.LTPE2 .imgLTPE2{
+	height: 16px; 
+	width: 16px;
+	float: right;
+	visibility: hidden;
+}
+#ajouterDesDiagnostics .listeDesDiagnosticsExistants table .LTPE2{
+	width: 99%;
+}
+#ajouterDesDiagnostics .listeDesDiagnosticsExistants table tr:hover .imgLTPE2{
+	float: right; 
+	height: 18px; 
+	width: 18px;
+	visibility: visible;
+}
+
+.imgLTPE2{
+	cursor: pointer;
+}
+
+#ajouterDesDiagnostics .ajouterUnDiagnostic table tr{
+	width: 100%;
+	font-size: 17px;
+	cursor: pointer;
+}
+
+#ajouterDesDiagnostics .ajouterUnDiagnostic table td{
+	padding-left: 6px;
+	padding-top: 5px;
+	padding-bottom: 2px;
+	width: 100%;
+}
+
+
+.tableAjoutDiagnostic, .tableAjoutDiagnostic tr, .tableAjoutDiagnostic td{
+	width: 100%; 
+}
+
+.tableAjoutDiagnostic tr:hover, .buttonTableAjoutDiagnostic tr:hover{
+	background : #fdfdfd;
+}
+
+.buttonTableAjoutDiagnostic button{
+	float: right; 
+	border: 1px;
+	border-radius: 15px;
+	border: 1px solid #bdb9b9;
+	height: 25px;
+	font-size: 13px;
+	margin-top: 5px;
+	margin-right: 10px;
+	font-family: times new roman;
+}
+
+.tableAjoutDiagnostic input[type='text']{
+	padding-top: 12px;
+	padding-bottom: 12px;
+	padding-left: 5px;
+	width: 97%;
+	font-family: times new roman;
+	font-size: 17px;
+	border: 1.5px solid #cccccc;
+	
+}
+
+.iconeAjouterChampDiag{
+	margin-left: 10px;
+}
+
+.affichageMessageInfos div{
+	color: gray;
+	margin-top: 13px;
+	margin-bottom: 13px;
+	font-size: 13px;
+}
+
+#infosConfirmationModification{
+	width: 100%; 
+	height: 10px; 
+}
+
+#infosConfirmationModification tr{
+	width: 100%; 
+	height: 10px;
+	font-size: 15px;
+	background: #f1f1f1;
+}
+
+#infosConfirmationModification td{
+	width: 95%; 
+	height: 25px; 
+	padding-left: 6px;
+}
+
+.affichageMessageInfos div{
+	color: gray;
+	margin-top: 13px;
+	margin-bottom: 13px;
+	font-size: 13px;
+}
+
+#affichageMessageInfosRemplaceModification input[type='text']{
+	margin-top: 2px;
+	margin-bottom: 10px;
+	width: 90%;
+	height: 40px;
+	padding-left: 8px;
+	font-size: 18px;
+	font-family: times new roman;
+	border: 2px solid #bdb9b9;
 }

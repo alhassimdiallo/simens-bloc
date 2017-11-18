@@ -1545,6 +1545,24 @@ class PatientTable {
 						$row[] = $this->adresseText($aRow[ $aColumns[$i] ]);
 					}
 		
+					else if ($aColumns[$i] == 'diagnostic') {
+						if($aRow[ $aColumns[$i] ]){
+							$row[] = '<div id="ajustDiagnostic" title="'.str_replace("'", '\'', $aRow[ $aColumns[$i]]).'">'.$aRow[ $aColumns[$i]].'</div>';
+						}else{
+							$admission = $this->getAdmissionDiagnosticBloc($aRow[ 'id_admission' ]);
+							$Diagnostics = ""; $idiag=1;
+							foreach ($admission as $adm){
+								if($idiag == $admission->count()){
+									$Diagnostics .= $adm['Libelle'];
+								}else{
+									$Diagnostics .= $adm['Libelle'].' + ';
+								}
+								$idiag++;
+							}
+							$row[] = $Diagnostics;
+						}
+					}
+					
 					else if ($aColumns[$i] == 'id') {
 						$verifPop = 1;
 						if(!$this->getProtocoleOperatoire($aRow[ 'id_admission' ])){ $verifPop = 0; }
@@ -1601,6 +1619,17 @@ class PatientTable {
 	}
 	
 	
+	public function getAdmissionDiagnosticBloc($id_admission){
+		$db = $this->tableGateway->getAdapter();
+		$sql2 = new Sql ($db );
+		$subselect1 = $sql2->select ();
+		$subselect1->from ( array ( 'ad' => 'admission_diagnostic_bloc' ) );
+		$subselect1->columns (array ( '*' ) );
+		$subselect1->join(array('db'=>'diagnostic_bloc'), 'db.id = ad.id_diagnostic', array('Libelle' => 'libelle'));
+		$subselect1->where (array ( 'id_admission' => $id_admission ) );
+	
+		return $sql2->prepareStatementForSqlObject($subselect1)->execute();
+	}
 	
 	
 	public function getListePatientsAdmisBlocOperatoire($idOperateur){
@@ -1706,7 +1735,21 @@ class PatientTable {
 					}
 					
 					else if ($aColumns[$i] == 'diagnostic') {
-						$row[] = '<div id="ajustDiagnostic" title="'.str_replace("'", '\'', $aRow[ $aColumns[$i]]).'">'.$aRow[ $aColumns[$i]].'</div>';
+						if($aRow[ $aColumns[$i] ]){
+							$row[] = '<div id="ajustDiagnostic" title="'.str_replace("'", '\'', $aRow[ $aColumns[$i]]).'">'.$aRow[ $aColumns[$i]].'</div>';
+						}else{
+							$admission = $this->getAdmissionDiagnosticBloc($aRow[ 'id_admission' ]);
+							$Diagnostics = ""; $idiag=1;
+							foreach ($admission as $adm){
+								if($idiag == $admission->count()){
+									$Diagnostics .= $adm['Libelle'];
+								}else{
+									$Diagnostics .= $adm['Libelle'].' + ';
+								}
+								$idiag++;
+							}
+							$row[] = $Diagnostics;
+						}
 					}
 					
 					else if ($aColumns[$i] == 'intervention_prevue') {
@@ -1842,7 +1885,21 @@ class PatientTable {
 					}
 					
 					else if ($aColumns[$i] == 'diagnostic') {
-						$row[] = '<div id="ajustDiagnostic" title="'.str_replace("'", '\'', $aRow[ $aColumns[$i]]).'">'.$aRow[ $aColumns[$i]].'</div>';
+						if($aRow[ $aColumns[$i] ]){
+							$row[] = '<div id="ajustDiagnostic" title="'.str_replace("'", '\'', $aRow[ $aColumns[$i]]).'">'.$aRow[ $aColumns[$i]].'</div>';
+						}else{
+							$admission = $this->getAdmissionDiagnosticBloc($aRow[ 'id_admission' ]);
+							$Diagnostics = ""; $idiag=1;
+							foreach ($admission as $adm){
+								if($idiag == $admission->count()){
+									$Diagnostics .= $adm['Libelle'];
+								}else{
+									$Diagnostics .= $adm['Libelle'].' + ';
+								}
+								$idiag++;
+							}
+							$row[] = $Diagnostics;
+						}
 					}
 						
 					else if ($aColumns[$i] == 'intervention_prevue') {

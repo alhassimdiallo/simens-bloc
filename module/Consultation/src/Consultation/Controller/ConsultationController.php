@@ -85,7 +85,8 @@ class ConsultationController extends AbstractActionController {
 	protected $demandeActeTable;
 	
 	protected $admissionTable;
-	
+	protected $admissionDiagnosticBlocTable;
+	protected $diagnostic_bloc;
 	
 	public function getAdmissionTable() {
 		if (! $this->admissionTable) {
@@ -310,6 +311,22 @@ class ConsultationController extends AbstractActionController {
 			$this->demandeActeTable = $sm->get ( 'Consultation\Model\DemandeActeTable' );
 		}
 		return $this->demandeActeTable;
+	}
+	
+	public function getAdmissionDiagnosticBlocTable() {
+		if (! $this->admissionDiagnosticBlocTable) {
+			$sm = $this->getServiceLocator ();
+			$this->admissionDiagnosticBlocTable = $sm->get ( 'Facturation\Model\AdmissionDiagnosticBlocTable' );
+		}
+		return $this->admissionDiagnosticBlocTable;
+	}
+	
+	public function getDiagnosticBlocTable() {
+		if (! $this->diagnostic_bloc) {
+			$sm = $this->getServiceLocator ();
+			$this->diagnostic_bloc = $sm->get ( 'Facturation\Model\DiagnosticTable' );
+		}
+		return $this->diagnostic_bloc;
 	}
 	/**
 	 * =========================================================================
@@ -5761,9 +5778,27 @@ class ConsultationController extends AbstractActionController {
  		$visitePA .= '<div style="border-bottom: 1px solid gray; margin-top: 10px; margin-bottom: 20px;"></div>';
  		
  		
+ 		$tabInfosDiagnostic = $this->getAdmissionDiagnosticBlocTable()->getAdmissionDiagnosticBloc($idAdmission);
+ 		$infosDiagnostic = "";
+ 		for($i=0 ; $i<count($tabInfosDiagnostic) ; $i++){
+
+ 			if(($i+1) == count($tabInfosDiagnostic)){
+ 				$diagnostic = $this->getDiagnosticBlocTable()->getDiagnosticBloc($tabInfosDiagnostic[$i]['id_diagnostic']);
+ 				$infosDiagnostic .= str_replace("'", "\'", $diagnostic->libelle.' '. $tabInfosDiagnostic[$i]['precision_diagnostic']);
+ 			}else{
+ 				$diagnostic = $this->getDiagnosticBlocTable()->getDiagnosticBloc($tabInfosDiagnostic[$i]['id_diagnostic']);
+ 				$infosDiagnostic .= str_replace("'", "\'", $diagnostic->libelle.' '. $tabInfosDiagnostic[$i]['precision_diagnostic']).' + ';
+ 			}
+ 				
+ 		}
+ 		
+ 		if($infosDiagnostic == ""){
+ 			$infosDiagnostic = str_replace("'", "\'",$InfoAdmis['diagnostic']);
+ 		}
+ 		
 		$visitePA .= '<table style="width: 100%;">';
 		$visitePA .='<tr style="width: 100%; ">';
- 		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['diagnostic']).' '.str_replace("'", "\'",$InfoAdmis['precision_diagnostic']).' </p></td>';
+ 		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.$infosDiagnostic.' </p></td>';
  		$visitePA .='<td style="width: 30%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Intervention pr&eacute;vue</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['intervention_prevue']).' </p></td>';
  		$visitePA .='<td style="width: 20%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">VPA</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['vpa']).' </p></td>';
  		$visitePA .='<td style="width: 15%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Salle</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['salle']).' </p></td>';
@@ -5914,7 +5949,22 @@ class ConsultationController extends AbstractActionController {
 	
 		$id_admission = $this->params ()->fromPost ( 'id_admission', 0 );
 		$InfoAdmission = $this->getAdmissionTable()->getPatientAdmisBloc($id_admission);
+		$listeDiagnostic = $this->getPatientTable()->getAdmissionDiagnosticBloc($id_admission);
+		
+		$infosDiagnostics = ""; 
+		$idiag=1;
+		foreach ($listeDiagnostic as $listeDiag){
+			if($idiag == $listeDiagnostic->count()){
+				$infosDiagnostics .= $listeDiag['Libelle'].' '.$listeDiag['precision_diagnostic'];
+			}else{
+				$infosDiagnostics .= $listeDiag['Libelle'].' '.$listeDiag['precision_diagnostic'].' + ';
+			}
+			$idiag++;
+		}
 	
+		if($infosDiagnostics == ""){
+			$infosDiagnostics = $InfoAdmission['diagnostic'];
+		}
 		
 		//Récupération des données des infos de l'en-tête
 		//Récupération des données des infos de l'en-tête
@@ -5941,7 +5991,7 @@ class ConsultationController extends AbstractActionController {
 		
 		$tabInformations[0]['titre'] = "Diagnostic";
 		$tabInformations[0]['type' ] = 1;
-		$tabInformations[0]['texte'] = iconv ('UTF-8' , 'windows-1252', $InfoAdmission['diagnostic'].' '.$InfoAdmission['precision_diagnostic']);
+		$tabInformations[0]['texte'] = iconv ('UTF-8' , 'windows-1252', $infosDiagnostics);
 		
 		$tabInformations[1]['titre'] = "Indication";
 		$tabInformations[1]['type' ] = 1;
@@ -6486,9 +6536,32 @@ class ConsultationController extends AbstractActionController {
 		$visitePA = '<span id="semaineDebutFin" style="cursor:pointer; padding-right: 20px; text-decoration: none;">  Re&ccedil;u le '. $this->controlDate->convertDate( $InfoAdmis['date'] ) .' &agrave; '.$InfoAdmis['heure'] .'</span>';
 		$visitePA .= '<div style="border-bottom: 1px solid gray; margin-top: 10px; margin-bottom: 20px;"></div>';
 			
+		
+		
+		$tabInfosDiagnostic = $this->getAdmissionDiagnosticBlocTable()->getAdmissionDiagnosticBloc($idAdmission);
+		$infosDiagnostic = "";
+		for($i=0 ; $i<count($tabInfosDiagnostic) ; $i++){
+		
+			if(($i+1) == count($tabInfosDiagnostic)){
+				$diagnostic = $this->getDiagnosticBlocTable()->getDiagnosticBloc($tabInfosDiagnostic[$i]['id_diagnostic']);
+				$infosDiagnostic .= str_replace("'", "\'", $diagnostic->libelle.' '. $tabInfosDiagnostic[$i]['precision_diagnostic']);
+			}else{
+				$diagnostic = $this->getDiagnosticBlocTable()->getDiagnosticBloc($tabInfosDiagnostic[$i]['id_diagnostic']);
+				$infosDiagnostic .= str_replace("'", "\'", $diagnostic->libelle.' '. $tabInfosDiagnostic[$i]['precision_diagnostic']).' + ';
+			}
+				
+		}
+			
+		if($infosDiagnostic == ""){
+			$infosDiagnostic = str_replace("'", "\'",$InfoAdmis['diagnostic']);
+		}
+		
+		
+		
+		
 		$visitePA .= '<table style="width: 100%;">';
 		$visitePA .='<tr style="width: 100%; ">';
-		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['diagnostic']).' </p></td>';
+		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.$infosDiagnostic.' </p></td>';
 		$visitePA .='<td style="width: 30%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Intervention pr&eacute;vue</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['intervention_prevue']).' </p></td>';
 		$visitePA .='<td style="width: 20%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">VPA</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['vpa']).' </p></td>';
 		$visitePA .='<td style="width: 15%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Salle</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['salle']).' </p></td>';

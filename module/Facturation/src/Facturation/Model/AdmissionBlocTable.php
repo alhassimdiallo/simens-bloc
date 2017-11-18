@@ -15,4 +15,9 @@ class AdmissionBlocTable {
 		return $this->tableGateway->select()->toArray();
 	}
 	
+	public function addAdmissionBloc($donnees){
+		$this->tableGateway->insert($donnees);
+		return $this->tableGateway->getLastInsertValue();
+	}
+	
 }

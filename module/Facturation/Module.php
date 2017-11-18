@@ -27,6 +27,8 @@ use Facturation\Model\DiagnosticTable;
 use Facturation\Model\Diagnostic;
 use Facturation\Model\AdmissionBlocTable;
 use Facturation\Model\AdmissionBloc;
+use Facturation\Model\AdmissionDiagnosticBlocTable;
+use Facturation\Model\AdmissionDiagnosticBloc;
 
 
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface, ServiceProviderInterface, ViewHelperProviderInterface {
@@ -147,7 +149,17 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
 							$resultSetPrototype->setArrayObjectPrototype(new AdmissionBloc());
 							return new TableGateway('admission_bloc', $dbAdapter, null, $resultSetPrototype);
 						},
-						
+						'Facturation\Model\AdmissionDiagnosticBlocTable' => function ($sm) {
+							$tableGateway = $sm->get('AdmissionDiagnosticBlocTableGateway');
+							$table = new AdmissionDiagnosticBlocTable($tableGateway);
+							return $table;
+						},
+						'AdmissionDiagnosticBlocTableGateway' => function($sm) {
+							$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+							$resultSetPrototype = new ResultSet();
+							$resultSetPrototype->setArrayObjectPrototype(new AdmissionDiagnosticBloc());
+							return new TableGateway('admission_diagnostic_bloc', $dbAdapter, null, $resultSetPrototype);
+						},
 						
 						
 						
