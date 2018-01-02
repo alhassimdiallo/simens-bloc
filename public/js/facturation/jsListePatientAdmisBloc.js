@@ -52,12 +52,14 @@
     
     
     var diagnostic = "";
+    var precision_diagnostic = "";
 	var intervention_prevue = "";
 	var vpa = "";
 	var salle = "";
 	var operateur = "";
 	
     var diagnostic2 = "";
+    var precision_diagnostic2 = "";
 	var intervention_prevue2 = "";
 	var vpa2 = "";
 	var salle2 = "";
@@ -65,6 +67,7 @@
 	
 	function valeursChamps(){
 	    diagnostic2 = $('#diagnostic').val();
+	    precision_diagnostic2 = $('#precision_diagnostic').val();
 		intervention_prevue2 = $('#intervention_prevue').val();
 		vpa2 = $('#vpa').val();
 		salle2 = $('#salle').val();
@@ -73,14 +76,12 @@
 	}
     
 	var verifPO = 0;
-    function affichervue(idPatient, idAdmission, verifPop){ 
-
+    function affichervue(idPatient, idAdmission, verifPop){
     	verifPO = verifPop;
         var chemin = tabUrl[0]+'public/facturation/vue-patient-admis-bloc';
         $.ajax({
             type: 'POST',
             url: chemin ,
-            data: $(this).serialize(),  
             data:{'idPatient':idPatient, 'idAdmission':idAdmission, 'verifPop':verifPop},
             success: function(data) {
        	    
@@ -90,22 +91,33 @@
             	     $("#contenu").fadeOut(function(){
             	    	 $("#informationAdmissionBloc").fadeIn("fast"); 
             	    	 
-            	    	 $(".boutonTerminer button").click(function(){
+            	    	 $(".boutonAnnuler button").click(function(){
+            	    		 /*
             	    		 valeursChamps(); 
-            	    		 
             	    		 if(
-            	    				 diagnostic != diagnostic2 || intervention_prevue != intervention_prevue2 || 
+            	    				 diagnostic != diagnostic2 || precision_diagnostic != precision_diagnostic2 || intervention_prevue != intervention_prevue2 || 
             	    				 vpa != vpa2 || salle != salle2 || operateur != operateur2 
             	    		 ){
             	    			 return true;
-            	    			 
             	    		 }
+            	    		 */
             	    		 
             	    		 $("#titre2").replaceWith("<div id='titre' style='font-family: police2; color: green; font-size: 18px; font-weight: bold; padding-left: 20px;'><iS style='font-size: 25px;'>&curren;</iS> LISTE DES PATIENTS ADMIS </div>");
             	    		 $("#informationAdmissionBloc").fadeOut(function(){$("#contenu").fadeIn("fast"); });
             	    		 return false;
             	    	 });
             	     
+            	    	 $(".boutonTerminer button").click(function(){
+            	    		 if(iclickModif == 1){
+                	    		 $('.ligneInfosDiagnostic select, .ligneInfosDiagnostic input').attr({'disabled': false, 'readonly':true});
+                	    		 $('#operateur').attr({'disabled': false, 'readonly': true});
+            	    		 }else{
+                	    		 $('.ligneInfosDiagnostic select, .ligneInfosDiagnostic input').attr({'disabled': false});
+                	    		 $('#operateur').attr({'disabled': false});
+            	    		 }
+
+            	    	 });
+            	    	 
             	     }); 
             	     
             },
@@ -119,7 +131,7 @@
     function initialisation(){
     	
     	$(".boutonAnnuler").html('<button type="submit" id="annuler" style=" font-family: police2; font-size: 17px; font-weight: bold;"> Annuler </button>');
-    	$(".boutonTerminer").html('<button type="submit" id="terminer" style=" font-family: police2; font-size: 17px; font-weight: bold;"> Terminer </button>');
+    	$(".boutonTerminer").html('<button type="submit" id="terminer" style=" font-family: police2; font-size: 17px; font-weight: bold;"> Enregistrer </button>');
 
     	var oTable;
     	$("#informationAdmissionBloc").toggle(false);
@@ -206,10 +218,12 @@
     		$('#afficherTous').css({'font-weight':'bold', 'font-size': '17px' });
     	});
     	
+    	appelScriptAutoCompletionDiagnostic();
     }
     
-    
+    var iclickModif = 0;
     function desactiverChampsInit(){
+    	iclickModif = 1;
     	$('#diagnostic').attr('readonly', true);
     	$('#intervention_prevue').attr('readonly', true);
     	$('#vpa').attr('readonly', true);
@@ -218,6 +232,7 @@
     	$('#service').attr('disabled', true);
     	
     	diagnostic = $('#diagnostic').val();
+    	precision_diagnostic = $('#precision_diagnostic').val();
     	intervention_prevue = $('#intervention_prevue').val();
     	vpa = $('#vpa').val();
     	salle = $('#salle').val();
@@ -226,26 +241,32 @@
     
     function desactiverChamps(){
     	$('#diagnostic').attr('readonly', true);
+    	$('#precision_diagnostic').attr('readonly', true);
     	$('#intervention_prevue').attr('readonly', true);
     	$('#vpa').attr('readonly', true);
     	$('#salle').attr('readonly', true);
+    	$('.ligneInfosDiagnostic select, .ligneInfosDiagnostic input').attr('disabled', true);
     	if(verifPO == 0){ $('#operateur').attr('disabled', true); }
     }
 
     function activerChamps(){
     	$('#diagnostic').attr('readonly', false);
+    	$('#precision_diagnostic').attr('readonly', false);
     	$('#intervention_prevue').attr('readonly', false);
     	$('#vpa').attr('readonly', false);
     	$('#salle').attr('readonly', false);
+    	$('.ligneInfosDiagnostic select, .ligneInfosDiagnostic input').attr('disabled', false);
     	if(verifPO == 0){ $('#operateur').attr('disabled', false); }
+    	
+    	
     }
     
-    var i = 0;
+   
     function modifierDonnees(){
-    	if(i == 0){
-        	activerChamps(); i = 1;
+    	if(iclickModif == 1){
+        	activerChamps(); iclickModif = 0;
     	}else{
-    		desactiverChamps(); i = 0;
+    		desactiverChamps(); iclickModif = 1;
     	}
     }
     
@@ -266,3 +287,82 @@
             }
         });
     }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    var listeSelectDiagnostic = "";
+    function appelScriptAutoCompletionDiagnostic(){
+        $.ajax({
+            type: 'POST',
+            url: tabUrl[0]+'public/facturation/get-liste-diagnostic-bloc',
+            data:null,
+            success: function(data) {    
+            	var result = jQuery.parseJSON(data);   
+            	listeSelectDiagnostic = result;
+            	ajouterUnDiagnostic();
+            }
+        });
+    }
+
+    function ajouterUnDiagnostic(){
+    	var nbLigne = $('.ligneInfosDiagnostic').length;
+    	 
+    	var ligne ="" +
+    	"<tr class='ligneInfosDiagnostic rowDiagnostic_"+(nbLigne+1)+"' style='width: 100%;'>"+ 
+            "<td style='width: 100%; height: 30px;'>"+
+              "<div class='liste_diagnostic_select' style='width: 50%; float: left;'>"+ 
+                 "<label>Diagnostic "+(nbLigne+1)+"</label><select style='width: 96%;' name='diagnostic_"+(nbLigne+1)+"' id='diagnostic_"+(nbLigne+1)+"' required>"+listeSelectDiagnostic+"</select>"+
+              "</div>"+
+              "<div style='width: 50%; float: left;'>"+
+                 "<label>Pr&eacute;cision du diagnostic "+(nbLigne+1)+"</label><input type='text' name='precision_diagnostic_"+(nbLigne+1)+"' id='precision_diagnostic_"+(nbLigne+1)+"' style='width: 90%;'>"+
+              "</div>"+
+            "</td>"+
+        "</tr>";
+    	
+    	$('.contenu-form-diagnostic .rowDiagnostic_'+nbLigne).after(ligne);
+    	
+    	if((nbLigne+1) > 1){ 
+    		$('.iconeAnnulerDiag').toggle(true);
+    	}else if((nbLigne+1) == 1){
+    		$('.iconeAnnulerDiag').toggle(false);
+    	}
+    	
+    	$('#nb_diagnostic').val(nbLigne+1);
+    }
+
+    function enleverUnDiagnostic(){
+    	var nbLigne = $('.ligneInfosDiagnostic').length;
+    	if(nbLigne > 1){
+    		$('.rowDiagnostic_'+nbLigne).remove();
+    		if(nbLigne == 2){ $('.iconeAnnulerDiag').toggle(false); }
+    	}
+    	
+    	$('#nb_diagnostic').val(nbLigne-1);
+    }
+

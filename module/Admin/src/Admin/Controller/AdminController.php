@@ -300,6 +300,10 @@ class AdminController extends AbstractActionController
     	$username = $uAuth->getAuthService()->getIdentity();
     	$user = $this->getUtilisateurTable()->getUtilisateursWithUsername($username);
     	 
+//     	$mod = 'khassorl';
+//     	$passwordDecrypte = $this->getUtilisateurTable()->encryptPassword($mod);
+//     	var_dump($passwordDecrypte); exit();
+    	
     	if(!$user){
     		return $this->redirect()->toRoute('admin', array('action' => 'login'));
     	}

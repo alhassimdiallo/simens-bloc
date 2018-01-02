@@ -478,7 +478,7 @@ font-size: 17px;
 
 left: 0px; /*déplacer le label*/
 
-min-width: 60px;
+min-width: 40px;
 
 padding-top: 4px;
 
@@ -692,7 +692,7 @@ padding-bottom: 5px;
 
 margin-bottom : 15px;
 
-margin-right: 25px;
+margin-right: 20px;
 
 padding-left: 10px; /* padding du text dans le champ*/
 
@@ -891,4 +891,182 @@ top: 0px;
 
 z-index: 1;
 
+}
+
+
+
+.label-form-diagnostic label{
+line-height: 0.8em;
+
+background-color: #eeeeee;
+
+background-image: none;
+
+background-repeat: repeat;
+
+background-attachment: scroll;
+
+background-position: 0% 0%;
+
+background-clip: border-box;
+
+background-origin: padding-box;
+
+border-top-right-radius: 15px;
+
+background-size: auto auto;
+
+box-shadow: 1px 2px 2px rgba(204, 204, 204, 0.8);
+
+color: black;
+
+display: inline-block;
+
+font-size: 17px;
+
+left: 0px; /*déplacer le label*/
+
+min-width: 60px;
+
+padding-top: 4px;
+
+padding-right: 10px;
+
+padding-bottom: 4px;
+
+padding-left: 10px;
+
+position: relative;
+
+top: -7px;
+
+z-index: 1;
+
+font-family: Goudy Old Style;
+}
+
+.label-form-diagnostic input[type='text']
+{
+	margin-top: -12px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.label-form-diagnostic label{
+line-height: 1.2em;
+
+background-color: #eeeeee;
+
+background-image: none;
+
+background-repeat: repeat;
+
+background-attachment: scroll;
+
+background-position: 0% 0%;
+
+background-clip: border-box;
+
+background-origin: padding-box;
+
+border-top-right-radius: 15px;
+
+background-size: auto auto;
+
+box-shadow: 1px 2px 2px rgba(204, 204, 204, 0.8);
+
+color: black;
+
+display: inline-block;
+
+font-size: 17px;
+
+left: 0px; /*déplacer le label*/
+
+min-width: 60px;
+
+padding-top: 4px;
+
+padding-right: 10px;
+
+padding-bottom: 4px;
+
+padding-left: 10px;
+
+position: relative;
+
+top: -7px;
+
+z-index: 1;
+
+font-family: Goudy Old Style;
+}
+
+.label-form-diagnostic input[type='text']
+{
+	margin-top: -12px;
+	width: 90%;
+}
+
+.label-form-diagnostic select
+{
+	margin-top: -12px;
+	width: 96%;
+}
+
+#titre_info_deces_prolonger{
+	font-style: italic;
+    font-family: Times  New Roman;
+    font-size: 18px;
+    color: green;
+    margin-top: 180px;
+    margin-left: 4%; /*18%*/
+}
+
+#barre_separateur_prolonger{
+    border-bottom: 2px solid #ccc;
+    margin-top: 3px;
+    margin-left: 4%; /*18%*/
+}
+
+.iconeAjouterDiag{
+	margin-left: 8px;
+	cursor: pointer;
+}
+
+.iconeAnnulerDiag{
+	cursor: pointer;
+}
+
+.contenu-form-diagnostic{
+	max-height: 180px;
+	height: 180px;
+	overflow-y: auto; 
 }

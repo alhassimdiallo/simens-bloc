@@ -85,6 +85,7 @@ class StatistiqueForm extends Form{
 				)
 		) );
 		
+		
 		$this->add ( array (
 				'name' => 'date_fin',
 				'type' => 'date',
@@ -115,5 +116,75 @@ class StatistiqueForm extends Form{
 				)
 		) );
 		
+		
+		
+		
+		
+		
+		
+		
+		//POUR LA TROISIEME PARTIE ----- STAT 3
+		//POUR LA TROISIEME PARTIE ----- STAT 3
+		//POUR LA TROISIEME PARTIE ----- STAT 3
+		//POUR LA TROISIEME PARTIE ----- STAT 3
+		$this->add ( array (
+				'name' => 'id_service_rapport',
+				'type' => 'Select',
+				'options' => array (
+						'label' => iconv('ISO-8859-1', 'UTF-8','Choix du service'),
+				),
+				'attributes' => array (
+						'registerInArrrayValidator' => true,
+						'onchange' => 'getInformationsServiceRapport(this.value)',
+						'id' => 'id_service_rapport',
+						'class' => 'select-element',
+				)
+		) );
+		
+		$this->add ( array (
+				'name' => 'date_debut_rapport',
+				'type' => 'date',
+				'options' => array (
+						'label' => iconv('ISO-8859-1', 'UTF-8','Date début'),
+				),
+				'attributes' => array (
+						'registerInArrrayValidator' => true,
+						'onchange' => 'getListeDateDebutRapport(this.value)',
+						'id' =>'date_debut_rapport',
+						'min'  => '2016-08-24',
+						'max' => "$dateAujourdhui",
+						'required' => true,
+				)
+		) );
+		
+		$this->add ( array (
+				'name' => 'date_fin_rapport',
+				'type' => 'date',
+				'options' => array (
+						'label' => iconv('ISO-8859-1', 'UTF-8','Date fin'),
+				),
+				'attributes' => array (
+						'registerInArrrayValidator' => true,
+						'onchange' => 'getListeDateFinRapport(this.value)',
+						'id' =>'date_fin_rapport',
+						'min' => '2016-08-24',
+						'max' => "$dateAujourdhui",
+						'required' => true,
+				)
+		) );
+		
+		$this->add ( array (
+				'name' => 'diagnostic_rapport',
+				'type' => 'Select',
+				'options' => array (
+						'label' => iconv('ISO-8859-1', 'UTF-8','Choix du diagnostic'),
+				),
+				'attributes' => array (
+						'registerInArrrayValidator' => true,
+						'onchange' => 'getListeDiagnosticRapport(this.value)',
+						'id' =>'diagnostic_rapport',
+						'class' => 'diagnostic_rapport',
+				)
+		) );
 	}
 }

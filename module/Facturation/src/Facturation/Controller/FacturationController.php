@@ -48,6 +48,7 @@ use Zend\Mail\Transport\Sendmail;
 
 use Facturation\View\Helper\PHPMailer;
 use Zend\Captcha\Factory;
+use Facturation\View\Helper\infosStatistiquePdf;
 
 class FacturationController extends AbstractActionController {
 	protected $dateHelper;
@@ -61,6 +62,9 @@ class FacturationController extends AbstractActionController {
 	protected $consultationTable;
 	protected $demandeActeTable;
 	protected $_galerieMailSender;
+	protected $diagnostic_bloc;
+	protected $admissionBlocTable;
+	protected $admissionDiagnosticBlocTable;
 	
 	public function getPatientTable() {
 		if (! $this->patientTable) {
@@ -119,6 +123,30 @@ class FacturationController extends AbstractActionController {
 			$this->demandeActeTable = $sm->get ( 'Consultation\Model\DemandeActeTable' );
 		}
 		return $this->demandeActeTable;
+	}
+	
+	public function getDiagnosticBlocTable() {
+		if (! $this->diagnostic_bloc) {
+			$sm = $this->getServiceLocator ();
+			$this->diagnostic_bloc = $sm->get ( 'Facturation\Model\DiagnosticTable' );
+		}
+		return $this->diagnostic_bloc;
+	}
+	
+	public function getAdmissionBlocTable() {
+		if (! $this->admissionBlocTable) {
+			$sm = $this->getServiceLocator ();
+			$this->admissionBlocTable = $sm->get ( 'Facturation\Model\AdmissionBlocTable' );
+		}
+		return $this->admissionBlocTable;
+	}
+	
+	public function getAdmissionDiagnosticBlocTable() {
+		if (! $this->admissionDiagnosticBlocTable) {
+			$sm = $this->getServiceLocator ();
+			$this->admissionDiagnosticBlocTable = $sm->get ( 'Facturation\Model\AdmissionDiagnosticBlocTable' );
+		}
+		return $this->admissionDiagnosticBlocTable;
 	}
 	
 	//GESTION DE LA GALERIE DES MAILS
@@ -327,6 +355,16 @@ class FacturationController extends AbstractActionController {
 		$layout = $this->layout ();
 		$layout->setTemplate ( 'layout/facturation' );
 		
+		//$listeDiagnostic = $this->getDiagnosticBlocTable()->getListeDIagnostic();
+		//$listeAdmissionBloc = $this->getAdmissionBlocTable()->getListeAdmissionBloc();
+		//var_dump($listeDiagnostic); exit();
+		//$listeDiagnostic = $this->getDiagnosticBlocTable()->getListeDiagnosticDansAdmission();
+		//var_dump(in_array(14, $listeDiagnostic)); exit();
+		
+		//$eue = $this->getDiagnosticBlocTable()->deleteUnDiagnosticBloc(36);
+		//var_dump($eue); exit();
+
+		
 		$numero = $this->numeroFacture();
 		//INSTANCIATION DU FORMULAIRE D'ADMISSION
 		$formAdmission = new AdmissionBlocForm();
@@ -415,6 +453,71 @@ class FacturationController extends AbstractActionController {
 		
 	}
 	
+	public function getListeDiagnosticBlocAction() {
+		
+		$listeDiagnostic = $this->getDiagnosticBlocTable()->getListeDiagnostic();
+		
+		$script ="<option value=''>  </option>";
+		for($i=0 ; $i < count($listeDiagnostic) ; $i++){
+			$script .="<option value='".$listeDiagnostic[$i]['id']."'>".$listeDiagnostic[$i]['libelle']."</option>";
+		}
+	
+		$this->getResponse ()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html; charset=utf-8' );
+		return $this->getResponse ()->setContent ( Json::encode ( $script ) );
+	}
+	
+	public function getListeDiagnosticBlocPopupAction()
+	{
+		$html  = "";
+		$listeDiagnosticBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticDecroissante();
+		$listeIdDiagnosticAdmission = $this->getDiagnosticBlocTable()->getListeIdDiagnosticDansAdmission();
+		
+		
+		for($i = 0 ; $i <  count($listeDiagnosticBloc); $i++){
+			if(in_array($listeDiagnosticBloc[$i]['id'], $listeIdDiagnosticAdmission)){
+				$html .="<tr><td class='LTPE2  libelleLTPE2_".$listeDiagnosticBloc[$i]['id']."' ><span>".str_replace("'", "'", $listeDiagnosticBloc[$i]['libelle'])."</span><img onclick='modifierDiagnosticBloc(".$listeDiagnosticBloc[$i]['id'].");' class='imgLTPE2' src='../img/light/pencil.png'> </td></tr>";
+			}else{
+				$html .="<tr><td class='LTPE2  libelleLTPE2_".$listeDiagnosticBloc[$i]['id']."' ><span>".str_replace("'", "'", $listeDiagnosticBloc[$i]['libelle'])."</span><img onclick='supprimerDiagnosticBloc(".$listeDiagnosticBloc[$i]['id'].");' class='imgLTPE2' src='../img/light/cross.png' title='supprimer'><img onclick='modifierDiagnosticBloc(".$listeDiagnosticBloc[$i]['id'].");' class='imgLTPE2' src='../img/light/pencil.png'> </td></tr>";
+			}
+		}
+
+		$this->getResponse()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html' );
+		return $this->getResponse ()->setContent(Json::encode ( $html ));
+	}
+	
+	public function addListeDiagnosticBlocPopupAction()
+	{
+		$tabListeDiagnostic = $this->params ()->fromPost ( 'tabListeDiagnostic' );
+	
+		$this->getDiagnosticBlocTable()->addListeDiagnosticBloc($tabListeDiagnostic);
+	
+		$this->getResponse()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html' );
+		return $this->getResponse ()->setContent(Json::encode ( ));
+	}
+	
+	public function updateListeDiagnosticBlocPopupAction()
+	{
+		$id = $this->params ()->fromPost ( 'id' );
+		$libelle = $this->params ()->fromPost ( 'libelle' );
+	
+		$this->getDiagnosticBlocTable()->updateDiagnosticBloc($id, $libelle);
+	
+		$this->getResponse()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html' );
+		return $this->getResponse ()->setContent(Json::encode ( $libelle ));
+	}
+	
+	public function supprimerUnDiagnosticBlocPopupAction()
+	{
+		$id = (int) $this->params ()->fromPost ( 'id' , 0);
+	
+		$this->getDiagnosticBlocTable()->deleteUnDiagnosticBloc($id);
+	
+		$this->getResponse()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html' );
+		return $this->getResponse ()->setContent(Json::encode ( $id ));
+	}
+	
+	
+	
 	public function getServiceAction() {
 		$id_medecin = ( int ) $this->params ()->fromPost ( 'id_medecin', 0 );
 		
@@ -499,11 +602,15 @@ class FacturationController extends AbstractActionController {
 		
 		$today = new \DateTime ( "now" );
 		$date_cons = $today->format ( 'Y-m-d' );
+
+		//LES INFORMATIONS DE L'ADMISSION --- LES INFORMATIONS DE L'ADMISSION
+		//LES INFORMATIONS DE L'ADMISSION --- LES INFORMATIONS DE L'ADMISSION
+		
 		$date = $today->format ( 'Y-m-d' );
 		$heure = $today->format ( 'H:i:s' );
-		
 		$id_patient = ( int ) $this->params ()->fromPost ( 'id_patient', 0 );
 		$diagnostic = $this->params ()->fromPost ( 'diagnostic' );
+		$precision_diagnostic = $this->params ()->fromPost ( 'precision_diagnostic' );
 		$intervention_prevue = $this->params ()->fromPost ( 'intervention_prevue' );
 		$vpa = $this->params ()->fromPost ( 'vpa' );
 		$salle = $this->params ()->fromPost ( 'salle' );
@@ -511,7 +618,6 @@ class FacturationController extends AbstractActionController {
 		
 		$donnees = array (
 				'id_patient' => $id_patient,
-				'diagnostic' => $diagnostic,
 				'intervention_prevue' => $intervention_prevue,
 				'vpa' => $vpa,
 				'salle' => $salle,
@@ -521,7 +627,25 @@ class FacturationController extends AbstractActionController {
 				'id_employe' => $id_employe,
 		);
 		
-		$this->getAdmissionTable ()->addAdmissionBloc ( $donnees );
+		$id_admission = $this->getAdmissionBlocTable ()->addAdmissionBloc($donnees);
+		
+		//LES INFORMATIONS DES DIAGNOSTICS --- LES INFORMATIONS DES DIAGNOSTICS
+		//LES INFORMATIONS DES DIAGNOSTICS --- LES INFORMATIONS DES DIAGNOSTICS
+		
+		$nb_diagnostic = $this->params ()->fromPost ( 'nb_diagnostic' );
+		$infos_diagnostic = array();
+		for($i=1 ; $i<=$nb_diagnostic ; $i++){
+			$diagnostic =  $this->params ()->fromPost ( 'diagnostic_'.$i );
+			if($diagnostic){
+				$infos_diagnostic[] = array(
+						'id_admission' => $id_admission,
+						'id_diagnostic' => $diagnostic,
+						'precision_diagnostic' => $this->params ()->fromPost ( 'precision_diagnostic_'.$i ),
+				);
+			}
+		}
+		
+		$this->getAdmissionDiagnosticBlocTable()->addAdmissionDiagnosticBloc($infos_diagnostic);
 		
 		return $this->redirect()->toRoute('facturation', array(
 				'action' =>'liste-patients-admis-bloc'));
@@ -556,6 +680,23 @@ class FacturationController extends AbstractActionController {
 		);
 		
 		$this->getAdmissionTable ()->updateAdmissionBloc( $donnees );
+		
+		//LES INFORMATIONS DES DIAGNOSTICS --- LES INFORMATIONS DES DIAGNOSTICS
+		//LES INFORMATIONS DES DIAGNOSTICS --- LES INFORMATIONS DES DIAGNOSTICS
+		
+		$nb_diagnostic = $this->params ()->fromPost ( 'nb_diagnostic' );
+		$infos_diagnostic = array();
+		for($i=1 ; $i<=$nb_diagnostic ; $i++){
+			$diagnostic =  $this->params ()->fromPost ( 'diagnostic_'.$i );
+			if($diagnostic){
+				$infos_diagnostic[] = array(
+						'id_admission' => $id_admission,
+						'id_diagnostic' => $diagnostic,
+						'precision_diagnostic' => $this->params ()->fromPost ( 'precision_diagnostic_'.$i ),
+				);
+			}
+		}
+		$this->getAdmissionDiagnosticBlocTable()->updateAdmissionDiagnosticBloc($infos_diagnostic, $id_admission);
 		
 		return $this->redirect()->toRoute('facturation', array(
 				'action' =>'liste-patients-admis-bloc'));
@@ -654,10 +795,6 @@ class FacturationController extends AbstractActionController {
 				"" => 'Tous'
 		);
 		
-		
-		//var_dump(in_array('1', $patientsAdmis->getPatientAdmisCons()) ); exit();
-		//var_dump($patientsAdmis->verifierPatientConsulter(13, 27)); exit();
-		
 		$tab_service = array_merge ( $afficheTous, $listeService );
 		$formAdmission->get ( 'service' )->setValueOptions ( $service );
 		$formAdmission->get ( 'liste_service' )->setValueOptions ( $tab_service );
@@ -691,6 +828,10 @@ class FacturationController extends AbstractActionController {
 		
 		//INSTANCIATION DU FORMULAIRE D'ADMISSION
 		$formAdmission = new AdmissionBlocForm();
+		
+		//$output = $this->getPatientTable ()->getListePatientsAdmisBloc();
+		//$InfoAdmis = $this->getAdmissionDiagnosticBlocTable()->getAdmissionDiagnosticBloc(1943);
+		//var_dump($output); exit();
 		
 		$this->layout ()->setTemplate ( 'layout/facturation' );
 		//INSTANCIATION DU FORMULAIRE
@@ -776,8 +917,7 @@ class FacturationController extends AbstractActionController {
 		
 		$datetime = $this->convertDate ($InfoAdmis['date']).' - '.$InfoAdmis['heure'];
 		
-		$html .= "<script> $('#diagnostic').val('".str_replace("'", "\'",$InfoAdmis['diagnostic'])."');";
-		$html .= "$('#id_admission').val('".str_replace("'", "\'",$InfoAdmis['id_admission'])."');";
+		$html .= "<script> $('#id_admission').val('".str_replace("'", "\'",$InfoAdmis['id_admission'])."');";
 		$html .= "$('#intervention_prevue').val('".str_replace("'", "\'",$InfoAdmis['intervention_prevue'])."');";
 		$html .= "$('#vpa').val('".str_replace("'", "\'",$InfoAdmis['vpa'])."');";
 		$html .= "$('#salle').val('".str_replace("'", "\'",$InfoAdmis['salle'])."');";
@@ -798,6 +938,30 @@ class FacturationController extends AbstractActionController {
 		}
 		
 		$html .= "<script>  setTimeout(function(){ desactiverChamps(); desactiverChampsInit(); },500); </script>";
+		
+		
+		//Affichage de diagnostics
+		//Affichage de diagnostics
+		$html .= "<script> $('.ligneInfosDiagnostic').remove(); </script>";
+		$tabInfosDiagnostic = $this->getAdmissionDiagnosticBlocTable()->getAdmissionDiagnosticBloc($InfoAdmis['id_admission']);
+		if(count($tabInfosDiagnostic) != 0){
+			for($i=0 ; $i<count($tabInfosDiagnostic) ; $i++){
+				if($i == 0){
+					$html .= "<script> $('.iconeAjouterDiag').trigger('click'); </script>";
+					$html .= "<script> $('#diagnostic_".($i+1)."').val(".$tabInfosDiagnostic[$i]['id_diagnostic']."); </script>";
+					$html .= "<script> $('#precision_diagnostic_".($i+1)."').val('".$tabInfosDiagnostic[$i]['precision_diagnostic']."'); </script>";
+				}else{
+					$html .= "<script> $('.iconeAjouterDiag').trigger('click'); </script>";
+					$html .= "<script> $('#diagnostic_".($i+1)."').val(".$tabInfosDiagnostic[$i]['id_diagnostic']."); </script>";
+					$html .= "<script> $('#precision_diagnostic_".($i+1)."').val('".$tabInfosDiagnostic[$i]['precision_diagnostic']."'); </script>";
+					
+				}
+			}
+		}else{
+			$html .= "<script> $('.iconeAjouterDiag').trigger('click'); </script>";
+		}
+		
+		
 		
 		$this->getResponse ()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html; charset=utf-8' );
 		return $this->getResponse()->setContent(Json::encode($html));
@@ -2646,7 +2810,7 @@ class FacturationController extends AbstractActionController {
 	//GESTION DES INFORMATIONS STATISTIQUES
 	public function informationsStatistiquesAction() {
 		$this->layout ()->setTemplate ( 'layout/facturation' );
-	
+		
 		//LES PATIENTS ADMIS ET OPERES
  		$nbPatient = $this->getPatientTable()->nbPatientAdmis();
  		$nbPatientF = $this->getPatientTable()->nbPatientAdmisSexeFem();
@@ -2669,10 +2833,13 @@ class FacturationController extends AbstractActionController {
  		$service = $this->getTarifConsultationTable()->listeServicePatientsOperes();
  		$formStatistique->get ( 'id_service' )->setValueOptions ( $service );
  		
- 		//Liste des diagnostics 
- 		$diagnostics = $this->getTarifConsultationTable()->listeDiagnosticsPatientsOperes();
- 		$formStatistique->get ( 'diagnostic' )->setValueOptions ( $diagnostics );
- 		//var_dump($diagnostics); exit();
+ 		//Liste des services pour les rapports 
+ 		$listeService = $this->getDiagnosticBlocTable()->getListeIdLibelleDiagnosticAdmissionServicesBloc();
+ 		$formStatistique->get ( 'id_service_rapport' )->setValueOptions ( $listeService );
+ 		//Liste des diagnostics pour les rapports
+ 		$listeDiagnostic = $this->getDiagnosticBlocTable()->getListeIdLibelleDiagnosticDansAdmission();
+ 		$formStatistique->get ( 'diagnostic_rapport' )->setValueOptions ( $listeDiagnostic );
+
  		
  		//Rechercher le premier ou le dernier patient
  		$premierOuDernierPatient = $this->getPatientTable()->premierDernierPatientOpereMedecinIntervenant(0);
@@ -2690,7 +2857,7 @@ class FacturationController extends AbstractActionController {
 				'sommePatients' => $sommePatients,
 				'pourcentage' => $pourcentage,
 				
-				'diagnostics' => $diagnostics, 
+				'diagnostics' => $listeDiagnostic, 
 		);
 	
 	}
@@ -4210,6 +4377,558 @@ class FacturationController extends AbstractActionController {
 		$response->setContent('Mail Sent.');
 		
 		return $response;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//GESTION DES RAPPORTS DES STATISTIQUES A GENERER
+	//GESTION DES RAPPORTS DES STATISTIQUES A GENERER
+	//GESTION DES RAPPORTS DES STATISTIQUES A GENERER
+	/**
+	 * Recuperer le tableau des statistiques des diagnostics par service
+	 */
+	public function getTableauStatistiquesDiagnosticsBlocAction(){
+
+		$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionServicesBloc();
+		
+		$toutService = array();
+		$diffService = array();
+		
+		$toutDiagnosticService = array();
+		$diffLibelleDiagnostic = array();
+		
+		$j=-1;
+		for($i=0 ; $i < count($listeDiagnosticAdmissionBloc) ; $i++){
+		
+			$service = $listeDiagnosticAdmissionBloc[$i]['nom_service'];
+			$toutService[] = $service;
+			if(!in_array($service, $diffService)){
+				$diffService[] = $service;
+				$diffLibelleDiagnostic[$service] = array();
+				$j++;
+			}
+				
+			if($diffService[$j] == $service){
+				$libelleDiagnostic = $listeDiagnosticAdmissionBloc[$i]['libelle'];
+				$toutDiagnosticService[$service][] = $libelleDiagnostic;
+				if(!in_array($libelleDiagnostic, $diffLibelleDiagnostic[$service])){
+					$diffLibelleDiagnostic[$service][] = $libelleDiagnostic;
+				}
+			}
+				
+		}
+		
+		$toutServiceNbVal = array_count_values($toutService);
+		$totatlDesInterventions = 0;
+		
+		$html ='<table class="titreTableauInfosStatistiques">
+				  <tr class="ligneTitreTableauInfos">
+				    <td rowspan="2" style="width: 35%; height: 40px;">Services</td>
+                    <td style="width: 50%; height: 40px;">Diagnostics</td>
+                    <td style="width: 15%; height: 40px;">Nombre</td>
+                  </tr>
+				</table>';
+		
+		$html .="<div id='listeTableauInfosStatistiques' style='min-height: 200px; max-height: 410px; overflow-y: auto;'>";
+		
+		for($i=0 ; $i<count($diffService) ; $i++){
+		
+			$totatlDesInterventions +=$toutServiceNbVal[$diffService[$i]];
+			
+			$prem = 1;
+			$html .="<table class='tableauInfosStatistiques'>";
+		
+			$toutDiagnosticNbVal = array_count_values($toutDiagnosticService[$diffService[$i]]);
+			$tabDiffLibelleDiagnostic = $diffLibelleDiagnostic[$diffService[$i]];
+				
+			for($j=0 ; $j<count($tabDiffLibelleDiagnostic) ; $j++){
+		
+				if($prem == 1){
+					$html .='<tr style="width: 100%; ">
+						           <td rowspan="'.count($tabDiffLibelleDiagnostic).'" style="width: 35%; height: 40px; background: re; text-align: center;"><span style="font-weight: bold;">'.$diffService[$i].'</span> </br> <span style="font-size: 14px;">(Nombre = <span style="font-size: 15px; font-weight: bold;">'.$toutServiceNbVal[$diffService[$i]].'</span>)</span></td>
+						           <td class="infosPath" style="width: 50%; height: 40px; background: yello;">'.$tabDiffLibelleDiagnostic[$j].'</td>
+						           <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: gree;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
+						         </tr>';
+					$prem++;
+				}else{
+					$html .='<tr style="width: 100%; ">
+                                   <td class="infosPath" style="width: 50%; height: 40px; background: orang;">'.$tabDiffLibelleDiagnostic[$j].'</td>
+                                   <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: brow;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
+                                 </tr>';
+				}
+			}
+			
+			$html .="</table>";
+		}
+		
+		$html .='<table class="piedTableauTotal">
+				  <tr>
+				    <td class="col1PiedTabTotal" style="width: 35%; height: 40px;"></td>
+                    <td class="col2PiedTabTotal colPiedTabTotal" style="width: 50%; height: 40px;">Total des interventions </td>
+                    <td class="col3PiedTabTotal colPiedTabTotal" style="width: 15%; height: 40px;">'.$totatlDesInterventions.'</td>
+                  </tr>
+				</table>';
+		
+		$html .="</div>";
+		
+		$this->getResponse ()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html; charset=utf-8' );
+		return $this->getResponse()->setContent(Json::encode($html));
+	}
+	
+	
+	function getTableauStatistiquesDiagnosticsParServiceBlocAction(){
+
+		$id_service = $this->params()->fromPost ('id_service');
+		
+		$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourUnService($id_service);
+		
+		$toutService = array();
+		$diffService = array();
+		
+		$toutDiagnosticService = array();
+		$diffLibelleDiagnostic = array();
+		
+		$j=-1;
+		for($i=0 ; $i < count($listeDiagnosticAdmissionBloc) ; $i++){
+		
+			$service = $listeDiagnosticAdmissionBloc[$i]['nom_service'];
+			$toutService[] = $service;
+			if(!in_array($service, $diffService)){
+				$diffService[] = $service;
+				$diffLibelleDiagnostic[$service] = array();
+				$j++;
+			}
+		
+			if($diffService[$j] == $service){
+				$libelleDiagnostic = $listeDiagnosticAdmissionBloc[$i]['libelle'];
+				$toutDiagnosticService[$service][] = $libelleDiagnostic;
+				if(!in_array($libelleDiagnostic, $diffLibelleDiagnostic[$service])){
+					$diffLibelleDiagnostic[$service][] = $libelleDiagnostic;
+				}
+			}
+		
+		}
+		
+		$toutServiceNbVal = array_count_values($toutService);
+		$totatlDesInterventions = 0;
+		
+		$html ='<table class="titreTableauInfosStatistiques">
+				  <tr class="ligneTitreTableauInfos">
+				    <td rowspan="2" style="width: 35%; height: 40px;">Services</td>
+                    <td style="width: 50%; height: 40px;">Diagnostics</td>
+                    <td style="width: 15%; height: 40px;">Nombre</td>
+                  </tr>
+				</table>';
+		
+		$html .="<div id='listeTableauInfosStatistiques' style='min-height: 100px; max-height: 410px; overflow-y: auto;'>";
+		
+		for($i=0 ; $i<count($diffService) ; $i++){
+		
+			$totatlDesInterventions +=$toutServiceNbVal[$diffService[$i]];
+				
+			$prem = 1;
+			$html .="<table class='tableauInfosStatistiques'>";
+		
+			$toutDiagnosticNbVal = array_count_values($toutDiagnosticService[$diffService[$i]]);
+			$tabDiffLibelleDiagnostic = $diffLibelleDiagnostic[$diffService[$i]];
+		
+			for($j=0 ; $j<count($tabDiffLibelleDiagnostic) ; $j++){
+		
+				if($prem == 1){
+					$html .='<tr style="width: 100%; ">
+						           <td rowspan="'.count($tabDiffLibelleDiagnostic).'" style="width: 35%; height: 40px; background: re; text-align: center;"><span style="font-weight: bold;">'.$diffService[$i].'</span> </br> <span style="font-size: 14px;">(Nombre = <span style="font-size: 15px; font-weight: bold;">'.$toutServiceNbVal[$diffService[$i]].'</span>)</span></td>
+						           <td class="infosPath" style="width: 50%; height: 40px; background: yello;">'.$tabDiffLibelleDiagnostic[$j].'</td>
+						           <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: gree;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
+						         </tr>';
+					$prem++;
+				}else{
+					$html .='<tr style="width: 100%; ">
+                                   <td class="infosPath" style="width: 50%; height: 40px; background: orang;">'.$tabDiffLibelleDiagnostic[$j].'</td>
+                                   <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: brow;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
+                                 </tr>';
+				}
+			}
+				
+			$html .="</table>";
+		}
+		
+		$html .='<table class="piedTableauTotal">
+				  <tr>
+				    <td class="col1PiedTabTotal" style="width: 35%; height: 40px;"></td>
+                    <td class="col2PiedTabTotal colPiedTabTotal" style="width: 50%; height: 40px;">Total des interventions </td>
+                    <td class="col3PiedTabTotal colPiedTabTotal" style="width: 15%; height: 40px;">'.$totatlDesInterventions.'</td>
+                  </tr>
+				</table>';
+		
+		$html .="</div>";
+		
+		$this->getResponse ()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html; charset=utf-8' );
+		return $this->getResponse()->setContent(Json::encode($html));
+		
+	}
+	
+	 
+	/**
+	 * Recuperer les informations statistiques des par service et par periode
+	 */
+
+	function getTableauStatistiquesDiagnosticsParServiceParPeriodeBlocAction(){
+
+
+		$id_service = (int) $this->params()->fromPost ('id_service');
+		$date_debut = $this->params()->fromPost ('date_debut');
+		$date_fin   = $this->params()->fromPost ('date_fin');
+
+		$control = new DateHelper();
+		$infoPeriodeRapport ="Rapport du ".$control->convertDate($date_debut)." au ".$control->convertDate($date_fin);
+		
+		if($id_service == 0){
+			$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourUnePeriode($date_debut, $date_fin);
+		}else 
+			if($id_service != 0){
+				$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourServicePourUnePeriode($id_service, $date_debut, $date_fin);
+			}
+		
+			$html ='<table class="titreTableauInfosStatistiques">
+				  <tr class="ligneTitreTableauInfos">
+				    <td rowspan="2" style="width: 35%; height: 40px;">Services</td>
+                    <td style="width: 50%; height: 40px;">Diagnostics</td>
+                    <td style="width: 15%; height: 40px;">Nombre</td>
+                  </tr>
+				</table>';
+			
+		if(count($listeDiagnosticAdmissionBloc) == 0){
+			$html .="<div id='listeTableauInfosStatistiques' style='height: 150px; padding-top: 50px;'>Aucune information &agrave; afficher</div>";
+		}else{
+			$toutService = array();
+			$diffService = array();
+			
+			$toutDiagnosticService = array();
+			$diffLibelleDiagnostic = array();
+			
+			$j=-1;
+			for($i=0 ; $i < count($listeDiagnosticAdmissionBloc) ; $i++){
+			
+				$service = $listeDiagnosticAdmissionBloc[$i]['nom_service'];
+				$toutService[] = $service;
+				if(!in_array($service, $diffService)){
+					$diffService[] = $service;
+					$diffLibelleDiagnostic[$service] = array();
+					$j++;
+				}
+			
+				if($diffService[$j] == $service){
+					$libelleDiagnostic = $listeDiagnosticAdmissionBloc[$i]['libelle'];
+					$toutDiagnosticService[$service][] = $libelleDiagnostic;
+					if(!in_array($libelleDiagnostic, $diffLibelleDiagnostic[$service])){
+						$diffLibelleDiagnostic[$service][] = $libelleDiagnostic;
+					}
+				}
+			
+			}
+			
+			$toutServiceNbVal = array_count_values($toutService);
+			$totatlDesInterventions = 0;
+			
+			
+			$html .="<div id='listeTableauInfosStatistiques' style='min-height: 50px; max-height: 410px; overflow-y: auto;'>";
+			
+			for($i=0 ; $i<count($diffService) ; $i++){
+			
+				$totatlDesInterventions +=$toutServiceNbVal[$diffService[$i]];
+			
+				$prem = 1;
+				$html .="<table class='tableauInfosStatistiques'>";
+			
+				$toutDiagnosticNbVal = array_count_values($toutDiagnosticService[$diffService[$i]]);
+				$tabDiffLibelleDiagnostic = $diffLibelleDiagnostic[$diffService[$i]];
+			
+				for($j=0 ; $j<count($tabDiffLibelleDiagnostic) ; $j++){
+			
+					if($prem == 1){
+						$html .='<tr style="width: 100%; ">
+						           <td rowspan="'.count($tabDiffLibelleDiagnostic).'" style="width: 35%; height: 40px; background: re; text-align: center;"><span style="font-weight: bold;">'.$diffService[$i].'</span> </br> <span style="font-size: 14px;">(Nombre = <span style="font-size: 15px; font-weight: bold;">'.$toutServiceNbVal[$diffService[$i]].'</span>)</span></td>
+						           <td class="infosPath" style="width: 50%; height: 40px; background: yello;">'.$tabDiffLibelleDiagnostic[$j].'</td>
+						           <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: gree;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
+						         </tr>';
+						$prem++;
+					}else{
+						$html .='<tr style="width: 100%; ">
+                                   <td class="infosPath" style="width: 50%; height: 40px; background: orang;">'.$tabDiffLibelleDiagnostic[$j].'</td>
+                                   <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: brow;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
+                                 </tr>';
+					}
+				}
+			
+				$html .="</table>";
+			}
+			
+			$html .='<table class="piedTableauTotal">
+				  <tr>
+				    <td class="col1PiedTabTotal" style="width: 35%; height: 40px;"></td>
+                    <td class="col2PiedTabTotal colPiedTabTotal" style="width: 50%; height: 40px;">Total des interventions </td>
+                    <td class="col3PiedTabTotal colPiedTabTotal" style="width: 15%; height: 40px;">'.$totatlDesInterventions.'</td>
+                  </tr>
+				</table>';
+			
+			$html .="</div>";
+		}
+		
+		$tabInfos = array($html, $infoPeriodeRapport);
+		
+		$this->getResponse ()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html; charset=utf-8' );
+		return $this->getResponse()->setContent(Json::encode($tabInfos));
+		
+	}
+	
+	/**
+	 * Recuperer les informations statistiques des par service et par periode et par diagnostic
+	 */
+	
+	function getTableauStatistiquesDiagnosticsParServiceParPeriodeParDiagnosticBlocAction(){
+	
+		$control = new DateHelper();
+	
+		//id_diagnostic à forcément une valeur diffente de zéro donc pas besoin de tester
+		$id_diagnostic = (int) $this->params()->fromPost ('id_diagnostic'); 
+		$id_service = (int) $this->params()->fromPost ('id_service');
+		$date_debut = $this->params()->fromPost ('date_debut');
+		$date_fin   = $this->params()->fromPost ('date_fin');
+	
+		$infoPeriodeRapport = "Rapport";
+		if($id_service == 0){
+			if($date_debut && $date_fin){
+				$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourDiagnosticPourUnePeriode($id_diagnostic, $date_debut, $date_fin);
+			    $infoPeriodeRapport ="Rapport du ".$control->convertDate($date_debut)." au ".$control->convertDate($date_fin);
+			}else{
+				$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourDiagnostic($id_diagnostic);
+			}
+		}else
+		if($id_service != 0){
+		
+			if($date_debut && $date_fin){
+				$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourDiagnosticPourServicePourUnePeriode($id_diagnostic, $id_service, $date_debut, $date_fin);
+				$infoPeriodeRapport ="Rapport du ".$control->convertDate($date_debut)." au ".$control->convertDate($date_fin);
+			}else{
+				$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourDiagnosticPourService($id_diagnostic, $id_service);
+			
+			}
+		}
+		
+		$html ='<table class="titreTableauInfosStatistiques">
+				  <tr class="ligneTitreTableauInfos">
+				    <td rowspan="2" style="width: 35%; height: 40px;">Services</td>
+                    <td style="width: 50%; height: 40px;">Diagnostics</td>
+                    <td style="width: 15%; height: 40px;">Nombre</td>
+                  </tr>
+				</table>';
+			
+		if(count($listeDiagnosticAdmissionBloc) == 0){
+			$html .="<div id='listeTableauInfosStatistiques' style='height: 150px; padding-top: 50px;'>Aucune information &agrave; afficher</div>";
+		}else{
+			$toutService = array();
+			$diffService = array();
+				
+			$toutDiagnosticService = array();
+			$diffLibelleDiagnostic = array();
+				
+			$j=-1;
+			for($i=0 ; $i < count($listeDiagnosticAdmissionBloc) ; $i++){
+					
+				$service = $listeDiagnosticAdmissionBloc[$i]['nom_service'];
+				$toutService[] = $service;
+				if(!in_array($service, $diffService)){
+					$diffService[] = $service;
+					$diffLibelleDiagnostic[$service] = array();
+					$j++;
+				}
+					
+				if($diffService[$j] == $service){
+					$libelleDiagnostic = $listeDiagnosticAdmissionBloc[$i]['libelle'];
+					$toutDiagnosticService[$service][] = $libelleDiagnostic;
+					if(!in_array($libelleDiagnostic, $diffLibelleDiagnostic[$service])){
+						$diffLibelleDiagnostic[$service][] = $libelleDiagnostic;
+					}
+				}
+					
+			}
+				
+			$toutServiceNbVal = array_count_values($toutService);
+			$totatlDesInterventions = 0;
+				
+				
+			$html .="<div id='listeTableauInfosStatistiques' style='min-height: 50px; max-height: 410px; overflow-y: auto;'>";
+				
+			for($i=0 ; $i<count($diffService) ; $i++){
+					
+				$totatlDesInterventions +=$toutServiceNbVal[$diffService[$i]];
+					
+				$prem = 1;
+				$html .="<table class='tableauInfosStatistiques'>";
+					
+				$toutDiagnosticNbVal = array_count_values($toutDiagnosticService[$diffService[$i]]);
+				$tabDiffLibelleDiagnostic = $diffLibelleDiagnostic[$diffService[$i]];
+					
+				for($j=0 ; $j<count($tabDiffLibelleDiagnostic) ; $j++){
+						
+					if($prem == 1){
+						$html .='<tr style="width: 100%; ">
+						           <td rowspan="'.count($tabDiffLibelleDiagnostic).'" style="width: 35%; height: 40px; background: re; text-align: center;"><span style="font-weight: bold;">'.$diffService[$i].'</span> </br> <span style="font-size: 14px;">(Nombre = <span style="font-size: 15px; font-weight: bold;">'.$toutServiceNbVal[$diffService[$i]].'</span>)</span></td>
+						           <td class="infosPath" style="width: 50%; height: 40px; background: yello;">'.$tabDiffLibelleDiagnostic[$j].'</td>
+						           <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: gree;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
+						         </tr>';
+						$prem++;
+					}else{
+						$html .='<tr style="width: 100%; ">
+                                   <td class="infosPath" style="width: 50%; height: 40px; background: orang;">'.$tabDiffLibelleDiagnostic[$j].'</td>
+                                   <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: brow;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
+                                 </tr>';
+					}
+				}
+					
+				$html .="</table>";
+			}
+				
+			$html .='<table class="piedTableauTotal">
+				  <tr>
+				    <td class="col1PiedTabTotal" style="width: 35%; height: 40px;"></td>
+                    <td class="col2PiedTabTotal colPiedTabTotal" style="width: 50%; height: 40px;">Total des interventions </td>
+                    <td class="col3PiedTabTotal colPiedTabTotal" style="width: 15%; height: 40px;">'.$totatlDesInterventions.'</td>
+                  </tr>
+				</table>';
+				
+			$html .="</div>";
+		}
+		
+		$tabInfos = array($html, $infoPeriodeRapport);
+		
+		$this->getResponse ()->getHeaders ()->addHeaderLine ( 'Content-Type', 'application/html; charset=utf-8' );
+		return $this->getResponse()->setContent(Json::encode($tabInfos));
+	
+	}
+	
+	/**
+	 * Imprimer les rapports diagnostics
+	 */
+	function imprimerRapportDesDiagnosticsDesInterventionsAction(){
+		$control = new DateHelper();
+		
+		$id_service = (int) $this->params()->fromPost ('id_service');
+		$id_diagnostic = (int) $this->params()->fromPost ('id_diagnostic');
+		$date_debut = $this->params()->fromPost ('date_debut');
+		$date_fin   = $this->params()->fromPost ('date_fin');
+		
+		$periodeIntervention = array();
+		
+		if($id_diagnostic != 0){ /*Un diagnostic est selectionné*/
+			
+			
+			/**===================**/
+			if($id_service == 0){
+				if($date_debut && $date_fin){
+					$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourDiagnosticPourUnePeriode($id_diagnostic, $date_debut, $date_fin);
+					$periodeIntervention[0] = $date_debut;
+					$periodeIntervention[1] = $date_fin;
+				}else{
+					$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourDiagnostic($id_diagnostic);
+				}
+			}else
+			if($id_service != 0){
+			
+				if($date_debut && $date_fin){
+					$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourDiagnosticPourServicePourUnePeriode($id_diagnostic, $id_service, $date_debut, $date_fin);
+					$periodeIntervention[0] = $date_debut;
+					$periodeIntervention[1] = $date_fin;
+				}else{
+					$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourDiagnosticPourService($id_diagnostic, $id_service);
+						
+				}
+			}
+			/************************/
+			
+			
+		}else 
+			if($date_debut && $date_fin){ /*Une période est selectionnée*/
+				
+				
+				/**=======================*/
+				$periodeIntervention[0] = $date_debut;
+				$periodeIntervention[1] = $date_fin;
+				if($id_service == 0){
+					$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourUnePeriode($date_debut, $date_fin);
+				}else
+				if($id_service != 0){
+					$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourServicePourUnePeriode($id_service, $date_debut, $date_fin);
+				}
+				/**************************/
+				
+				
+			}else 
+				if($id_service != 0){ /*Un service est selectionné*/
+					
+					
+					/**==============**/
+					$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourUnService($id_service);
+					/******************/
+
+					
+				}else{ /*Aucun paramètre n'est selectionné*/
+					
+					
+					/**==============**/
+					$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionServicesBloc();
+					/******************/
+				
+				
+				}
+				
+				$user = $this->layout()->user;
+				$nomService = $user['NomService'];
+				$infosComp['dateImpression'] = (new \DateTime ())->format( 'd/m/Y' );
+				
+				$pdf = new infosStatistiquePdf();
+				$pdf->SetMargins(13.5,13.5,13.5);
+				$pdf->setTabInformations($listeDiagnosticAdmissionBloc);
+				
+				$pdf->setNomService($nomService);
+				$pdf->setInfosComp($infosComp);
+				$pdf->setPeriodeIntervention($periodeIntervention);
+				
+				$pdf->ImpressionInfosStatistiques();
+				$pdf->Output('I');
+		
 	}
 	
 }

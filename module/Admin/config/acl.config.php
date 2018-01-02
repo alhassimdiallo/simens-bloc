@@ -181,6 +181,17 @@ return array(
     								
     								'infos-stat-imprime' => array('major', 'medecin', 'superAdmin'),
     								'creation-image' => array('major', 'medecin', 'superAdmin'),
+    								'get-liste-diagnostic-bloc' => array('major', 'medecin', 'superAdmin'),
+    								'get-liste-diagnostic-bloc-popup' => array('major', 'medecin', 'superAdmin'),
+    								'add-liste-diagnostic-bloc-popup' => array('major', 'medecin', 'superAdmin'),
+    								'update-liste-diagnostic-bloc-popup' => array('major', 'medecin', 'superAdmin'),
+    								'supprimer-un-diagnostic-bloc-popup' => array('major', 'medecin', 'superAdmin'),
+    								'get-tableau-statistiques-diagnostics-bloc' => array('major', 'medecin', 'superAdmin'),
+    								'get-tableau-statistiques-diagnostics-par-service-bloc' => array('major', 'medecin', 'superAdmin'),
+    								'get-tableau-statistiques-diagnostics-par-service-par-periode-bloc' => array('major', 'medecin', 'superAdmin'),
+    								'get-tableau-statistiques-diagnostics-par-service-par-periode-par-diagnostic-bloc' => array('major', 'medecin', 'superAdmin'),
+    								'imprimer-rapport-des-diagnostics-des-interventions' => array('major', 'medecin', 'superAdmin'),
+    								
     						),
     						
     						
@@ -271,6 +282,13 @@ return array(
     						        'ajouter-mp3-protocole' => array('medecin', 'superAdmin'),
     						        'inserer-bd-mp3-protocole' => array('medecin', 'superAdmin'),
     						        'supprimer-mp3-protocole' => array('medecin', 'superAdmin'),
+    								'imprimer-compte-rendu-operatoire' => array('medecin', 'superAdmin'),
+    								
+    								
+    								
+    								
+    								//POUR LE TEST DU PLUGIN FPDF
+    								'fpdf-document'  => array('medecin', 'superAdmin'),
     						),
     						
     						

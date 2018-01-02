@@ -117,7 +117,6 @@ function initialisation(){
 
 }
 
-
 function clickRowHandler() 
 {
 	var id;
@@ -392,4 +391,278 @@ function scriptFactMajor(){
 		}
 		
 	});
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var listeSelectDiagnostic = "";
+function appelScriptAutoCompletionDiagnostic(){
+    $.ajax({
+        type: 'POST',
+        url: tabUrl[0]+'public/facturation/get-liste-diagnostic-bloc',
+        data:null,
+        success: function(data) {    
+        	var result = jQuery.parseJSON(data);   
+        	listeSelectDiagnostic = result;
+        	ajouterUnDiagnostic();
+        }
+    });
+    
+    listeDesDiagnosticsBloc();
+}
+
+function ajouterUnDiagnostic(){
+	var nbLigne = $('.ligneInfosDiagnostic').length;
+	 
+	var ligne ="" +
+	"<tr class='ligneInfosDiagnostic rowDiagnostic_"+(nbLigne+1)+"' style='width: 100%;'>"+ 
+        "<td style='width: 100%; height: 30px;'>"+
+          "<div class='liste_diagnostic_select' style='width: 50%; float: left;'>"+ 
+             "<label>Diagnostic "+(nbLigne+1)+"</label><select style='width: 98%;' name='diagnostic_"+(nbLigne+1)+"' required>"+listeSelectDiagnostic+"</select>"+
+          "</div>"+
+          "<div style='width: 50%; float: left;'>"+
+             "<label>Pr&eacute;cision du diagnostic "+(nbLigne+1)+"</label><input type='text' name='precision_diagnostic_"+(nbLigne+1)+"'  style='width: 90%;'>"+
+          "</div>"+
+        "</td>"+
+    "</tr>";
+	
+	$('.contenu-form-diagnostic .rowDiagnostic_'+nbLigne).after(ligne);
+	
+	if((nbLigne+1) > 1){ 
+		$('.iconeAnnulerDiag').toggle(true);
+	}else if((nbLigne+1) == 1){
+		$('.iconeAnnulerDiag').toggle(false);
+	}
+	
+	$('#nb_diagnostic').val(nbLigne+1);
+}
+
+function enleverUnDiagnostic(){
+	var nbLigne = $('.ligneInfosDiagnostic').length;
+	if(nbLigne > 1){
+		$('.rowDiagnostic_'+nbLigne).remove();
+		if(nbLigne == 2){ $('.iconeAnnulerDiag').toggle(false); }
+	}
+	
+	$('#nb_diagnostic').val(nbLigne-1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function listeDesDiagnosticsBloc(){
+    $.ajax({
+        type: 'POST',
+        url: tabUrl[0]+'public/facturation/get-liste-diagnostic-bloc-popup',
+        data:null,
+        success: function(data) {    
+        	var result = jQuery.parseJSON(data);   
+        	$('.listeDesDiagnosticsExistants table').html(result);
+        }
+    });
+}
+
+function ajouterAdmissionDiagnostic(){
+	$('.iconeAnnulerChampDiag').toggle(false);
+	$('.ligneInfosChampDiagnostic').remove();
+    ajouterUnChampAjoutDiagnostic();
+    
+	$( "#ajouterDesDiagnostics" ).dialog({
+		resizable: false,
+	    height:480,
+	    width:750,
+	    autoOpen: false,
+	    modal: true,
+	    buttons: {
+	        "Fermer": function() {
+              $( this ).dialog( "close" );
+	        }
+	    }
+	});
+  
+	$("#ajouterDesDiagnostics").dialog('open');
+	
+}
+
+function ajouterUnChampAjoutDiagnostic(){
+	var nbLigne = $('.ligneInfosChampDiagnostic').length;
+	 
+	var ligne ="" +
+	"<tr class='ligneInfosChampDiagnostic rowAjoutDiagnostic_"+(nbLigne+1)+"' style='width: 100%;'>"+ 
+        "<td>"+
+             "<input type='text' name='diagnostic_ajouter_"+(nbLigne+1)+"' id='diagnostic_ajouter_"+(nbLigne+1)+"'>"+
+        "</td>"+
+    "</tr>";
+	
+	$('.tableAjoutDiagnostic .rowAjoutDiagnostic_'+nbLigne).after(ligne);
+	
+	if((nbLigne+1) > 1){ 
+		$('.iconeAnnulerChampDiag').toggle(true);
+	}else if((nbLigne+1) == 1){
+		$('.iconeAnnulerChampDiag').toggle(false);
+	}
+}
+
+function enleverUnChampAjoutDiagnostic(){
+	var nbLigne = $('.ligneInfosChampDiagnostic').length;
+	if(nbLigne > 1){
+		$('.rowAjoutDiagnostic_'+nbLigne).remove();
+		if(nbLigne == 2){ $('.iconeAnnulerChampDiag').toggle(false); }
+	}
+}
+
+function raffraichirListeDesDiagnostics(){
+    $.ajax({
+        type: 'POST',
+        url: tabUrl[0]+'public/facturation/get-liste-diagnostic-bloc',
+        data:null,
+        success: function(data) {    
+        	listeSelectDiagnostic = jQuery.parseJSON(data);   
+        	$('.liste_diagnostic_select select').html(listeSelectDiagnostic);
+        }
+    });
+}
+
+function enregistrerNouveauxDiagnostics(){
+	var nbLigne = $('.ligneInfosChampDiagnostic').length;
+	
+	var tabListeDiagnostic = new Array();
+	var indiceTab = 0;
+	for(var ind=1 ; ind<=nbLigne ; ind++){
+		var diagAajouter = $('#diagnostic_ajouter_'+ind).val();
+		if(diagAajouter){
+			tabListeDiagnostic[indiceTab++] = $('#diagnostic_ajouter_'+ind).val();
+		}
+	}
+	
+	if(tabListeDiagnostic.length != 0){
+		var reponse = confirm("Confirmer l'enregistrement des nouveaux diagnostic");
+		if (reponse == true) {
+			$('.ligneInfosChampDiagnostic input').attr('readonly', true);
+			$('.buttonTableAjoutDiagnostic button').attr('disabled', true);
+			$.ajax({
+		        type: 'POST',
+		        url: tabUrl[0]+'public/facturation/add-liste-diagnostic-bloc-popup',
+		        data:{'tabListeDiagnostic':tabListeDiagnostic},
+		        success: function(data) {    
+		        	$('.listeDesDiagnosticsExistants table').html('<tr> <td style="margin-top: 35px; border: 1px solid #ffffff; text-align: center;"> Chargement </td> </tr>  <tr> <td align="center" style="border: 1px solid #ffffff; text-align: center;"> <img style="margin-top: 13px; width: 50px; height: 50px;" src="../images/loading/Chargement_1.gif" /> </td> </tr>');
+		        	listeDesDiagnosticsBloc();
+		        	$('.ligneInfosChampDiagnostic').remove();
+		    		ajouterUnChampAjoutDiagnostic();
+		    		$('.buttonTableAjoutDiagnostic button').attr('disabled', false);
+		    		raffraichirListeDesDiagnostics();
+		        }
+		    });
+		}
+	}
+	
+}
+
+function modifierDiagnosticBloc(id){
+	var libelleDiagnostic = $('.libelleLTPE2_'+id+' span').html();
+	$('#infosConfirmationModification').html("<tr><td>"+libelleDiagnostic+"</td></tr>");
+	
+	$( "#modifierDiagnosticBloc" ).dialog({
+		resizable: false,
+	    height:300,
+	    width:450,
+	    autoOpen: false,
+	    modal: true,
+	    buttons: {
+	    	"Annuler": function() {
+	    		$( this ).dialog( "close" );
+		    },
+	        "Modifier": function() {
+	        	
+	        	var libelleDiagnosticBloc = $('#affichageMessageInfosRemplaceModification input').val();
+	        	if(libelleDiagnosticBloc){
+		        	var reponse = confirm("Confirmer la modification du diagnostic");
+					if (reponse == false) { return false; }
+					else{
+				      	$('.libelleLTPE2_'+id+' span').html(libelleDiagnostic+ " <img style='margin-left: 5px; width: 18px; height: 18px;' src='../images/loading/Chargement_1.gif' />");
+			        	$( this ).dialog( "close" );
+
+			        	$.ajax({
+			        		type : 'POST',
+			        		url : tabUrl[0] + 'public/facturation/update-liste-diagnostic-bloc-popup',
+			        		data : {'id' : id, 'libelle' : libelleDiagnosticBloc },
+			        		success : function(data) {
+			        			var result = jQuery.parseJSON(data);
+			        			$('.libelleLTPE2_'+id+' span').html(result);
+			        			$('#affichageMessageInfosRemplaceModification input').val('');
+			        			raffraichirListeDesDiagnostics();
+			        		}
+			        	});
+			        	
+					}
+	        	}
+	        	
+	        }
+	    }
+	});
+
+	$("#modifierDiagnosticBloc").dialog('open');
+	 
+}
+
+function supprimerDiagnosticBloc(id){
+	var reponse = confirm("Confirmer la suppression du diagnostic");
+	if (reponse == false) { return false; }
+	else{
+		$.ajax({
+			type : 'POST',
+			url : tabUrl[0] + 'public/facturation/supprimer-un-diagnostic-bloc-popup',
+			data : {'id' : id},
+			success : function(data) {
+				$('.libelleLTPE2_'+id).parent().fadeOut();
+				var result = jQuery.parseJSON(data);
+				listeDesDiagnosticsBloc();
+				raffraichirListeDesDiagnostics();
+			}
+		});
+	}
 }

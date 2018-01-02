@@ -43,15 +43,23 @@ class AdmissionBlocForm extends Form{
 
 		$this->add ( array (
 				'name' => 'diagnostic',
-				'type' => 'TextArea',
+				'type' => 'Text',
 				'options' => array (
 						'label' => iconv('ISO-8859-1', 'UTF-8','Diagnostic')
 				),
 				'attributes' => array (
 						'id' => 'diagnostic',
+						'style' => 'margin-bottom: 10px;',
 				)
 		) );
 		
+		$this->add ( array (
+				'name' => 'nb_diagnostic',
+				'type' => 'hidden',
+				'attributes' => array (
+						'id' => 'nb_diagnostic',
+				)
+		) );
 		
 		$this->add ( array (
 				'name' => 'intervention_prevue',

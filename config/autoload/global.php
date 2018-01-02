@@ -14,7 +14,7 @@
 return array (
 		'db' => array (
 				'driver' => 'Pdo',
-				'dsn' => 'mysql:dbname=simensh-12-04-17;host=localhost',
+				'dsn' => 'mysql:dbname=simens-bloc-171017;host=localhost',
 				'driver_options' => array (
 						PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 				)

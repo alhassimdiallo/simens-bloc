@@ -50,6 +50,7 @@ use Consultation\Form\ProtocoleOperatoireForm;
 use Consultation\View\Helpers\CompteRenduOperatoirePdf;
 use Consultation\View\Helpers\CompteRenduOperatoirePage2Pdf;
 use Zend\XmlRpc\Value\String;
+use Consultation\View\Helpers\fpdf181\PDF;
 
 class ConsultationController extends AbstractActionController {
 	protected $controlDate;
@@ -84,7 +85,8 @@ class ConsultationController extends AbstractActionController {
 	protected $demandeActeTable;
 	
 	protected $admissionTable;
-	
+	protected $admissionDiagnosticBlocTable;
+	protected $diagnostic_bloc;
 	
 	public function getAdmissionTable() {
 		if (! $this->admissionTable) {
@@ -309,6 +311,22 @@ class ConsultationController extends AbstractActionController {
 			$this->demandeActeTable = $sm->get ( 'Consultation\Model\DemandeActeTable' );
 		}
 		return $this->demandeActeTable;
+	}
+	
+	public function getAdmissionDiagnosticBlocTable() {
+		if (! $this->admissionDiagnosticBlocTable) {
+			$sm = $this->getServiceLocator ();
+			$this->admissionDiagnosticBlocTable = $sm->get ( 'Facturation\Model\AdmissionDiagnosticBlocTable' );
+		}
+		return $this->admissionDiagnosticBlocTable;
+	}
+	
+	public function getDiagnosticBlocTable() {
+		if (! $this->diagnostic_bloc) {
+			$sm = $this->getServiceLocator ();
+			$this->diagnostic_bloc = $sm->get ( 'Facturation\Model\DiagnosticTable' );
+		}
+		return $this->diagnostic_bloc;
 	}
 	/**
 	 * =========================================================================
@@ -5619,11 +5637,12 @@ class ConsultationController extends AbstractActionController {
 		$this->layout()->setTemplate('layout/consultation');
 		$user = $this->layout()->user;
 		$prenomNom = $user['Prenom'].' '.$user['Nom'];
+		$idMedecin = $user['id_employe'];
 		
 		$formPO = new ProtocoleOperatoireForm();
 		
-		$listeProtocolePO = $this->getAdmissionTable()->getListeProtocoleOperatoireBloc();
-		$listeProtocoleSOP = $this->getAdmissionTable()->getListeSoinsPostOperatoireBloc();
+		$listeProtocolePO = $this->getAdmissionTable()->getListeProtocoleOperatoireBloc($idMedecin);
+		$listeProtocoleSOP = $this->getAdmissionTable()->getListeSoinsPostOperatoireBloc($idMedecin);
 		$listeIndicationPO = $this->getAdmissionTable()->getListeIndicationPOBloc();
 		$listeTypeAnesthesiePO = $this->getAdmissionTable()->getListeTypeAnesthesiePOBloc();
 		
@@ -5759,9 +5778,27 @@ class ConsultationController extends AbstractActionController {
  		$visitePA .= '<div style="border-bottom: 1px solid gray; margin-top: 10px; margin-bottom: 20px;"></div>';
  		
  		
+ 		$tabInfosDiagnostic = $this->getAdmissionDiagnosticBlocTable()->getAdmissionDiagnosticBloc($idAdmission);
+ 		$infosDiagnostic = "";
+ 		for($i=0 ; $i<count($tabInfosDiagnostic) ; $i++){
+
+ 			if(($i+1) == count($tabInfosDiagnostic)){
+ 				$diagnostic = $this->getDiagnosticBlocTable()->getDiagnosticBloc($tabInfosDiagnostic[$i]['id_diagnostic']);
+ 				$infosDiagnostic .= str_replace("'", "\'", $diagnostic->libelle.' '. $tabInfosDiagnostic[$i]['precision_diagnostic']);
+ 			}else{
+ 				$diagnostic = $this->getDiagnosticBlocTable()->getDiagnosticBloc($tabInfosDiagnostic[$i]['id_diagnostic']);
+ 				$infosDiagnostic .= str_replace("'", "\'", $diagnostic->libelle.' '. $tabInfosDiagnostic[$i]['precision_diagnostic']).' + ';
+ 			}
+ 				
+ 		}
+ 		
+ 		if($infosDiagnostic == ""){
+ 			$infosDiagnostic = str_replace("'", "\'",$InfoAdmis['diagnostic']);
+ 		}
+ 		
 		$visitePA .= '<table style="width: 100%;">';
 		$visitePA .='<tr style="width: 100%; ">';
- 		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['diagnostic']).' </p></td>';
+ 		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.$infosDiagnostic.' </p></td>';
  		$visitePA .='<td style="width: 30%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Intervention pr&eacute;vue</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['intervention_prevue']).' </p></td>';
  		$visitePA .='<td style="width: 20%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">VPA</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['vpa']).' </p></td>';
  		$visitePA .='<td style="width: 15%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Salle</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['salle']).' </p></td>';
@@ -5793,27 +5830,36 @@ class ConsultationController extends AbstractActionController {
 		$id_admission = $this->params ()->fromPost ( 'id_admission', 0 );
 		$InfoAdmission = $this->getAdmissionTable()->getPatientAdmisBloc($id_admission);
 		
-		//Récupération des données
+		//Récupération des données 
 		$donnees['anesthesiste'] = str_replace("â€™", "'", $this->params ()->fromPost ( 'anesthesiste' ));
+		$donnees['anesthesiste'] = str_replace("’", "'", $this->params ()->fromPost ( 'anesthesiste' ));
+		
 		$donnees['indication'] = str_replace("â€™", "'", $this->params ()->fromPost (  'indication' ));
+		$donnees['indication'] = str_replace("’", "'", $this->params ()->fromPost (  'indication' ));
 		$donnees['indication'] = str_replace("œ", "oe" ,$donnees['indication']); //A revoir
 		
 		$donnees['type_anesthesie'] = str_replace("â€™", "'", $this->params()->fromPost('type_anesthesie'));
+		$donnees['type_anesthesie'] = str_replace("’", "'", $this->params()->fromPost('type_anesthesie'));
 		$donnees['type_anesthesie'] = str_replace("œ", "oe" ,$donnees['type_anesthesie']); //A revoir
 		
 		$donnees['protocole_operatoire'] = str_replace("â€™", "'", $this->params()->fromPost('protocole_operatoire'));
+		$donnees['protocole_operatoire'] = str_replace("’", "'", $this->params()->fromPost('protocole_operatoire'));
 		$donnees['protocole_operatoire'] = str_replace("œ", "oe" ,$donnees['protocole_operatoire']); //A revoir
 		
 		$donnees['soins_post_operatoire'] = str_replace("â€™", "'", $this->params()->fromPost('soins_post_operatoire'));
+		$donnees['soins_post_operatoire'] = str_replace("’", "'", $this->params()->fromPost('soins_post_operatoire'));
 		$donnees['soins_post_operatoire'] = str_replace("œ", "oe" ,$donnees['soins_post_operatoire']); //A revoir
 		
 		$donnees['check_list_securite'] = $this->params()->fromPost( 'check_list_securite');
 		$donnees['note_audio_cro'] = str_replace("â€™", "'", $this->params()->fromPost('note_audio_cro'));
+		$donnees['note_audio_cro'] = str_replace("’", "'", $this->params()->fromPost('note_audio_cro'));
 		$donnees['note_audio_cro'] = str_replace("œ", "oe" ,$donnees['note_audio_cro']); //A revoir
 		
 		$donnees['aides_operateurs'] = str_replace("â€™", "'", $this->params()->fromPost('aides_operateurs'));
+		$donnees['aides_operateurs'] = str_replace("’", "'", $this->params()->fromPost('aides_operateurs'));
 		
 		$donnees['complications'] = str_replace("â€™", "'", $this->params()->fromPost('complications'));
+		$donnees['complications'] = str_replace("’", "'", $this->params()->fromPost('complications'));
 		$donnees['complications'] = str_replace("œ", "oe" ,$donnees['complications']); //A revoir
 		
 		$donnees['dateIntervention'] =  $control->getDateInDateTimeDHM( $this->params ()->fromPost ( 'calendrierDateIntervention' ) );
@@ -5882,6 +5928,113 @@ class ConsultationController extends AbstractActionController {
 		//Afficher le document contenant la page
 		$DocPdf->getDocument();
 	}
+	
+	
+	//Utilisation du plugin fpdf --- Utilisation du plugin fpdf
+	//Utilisation du plugin fpdf --- Utilisation du plugin fpdf 
+	//Utilisation du plugin fpdf --- Utilisation du plugin fpdf
+	public function imprimerCompteRenduOperatoireAction(){
+	
+		$control = new DateHelper();
+	
+		$user = $this->layout()->user;
+		$serviceMedecin = $user['NomService'];
+	
+		$nomMedecin = $user['Nom'];
+		$prenomMedecin = $user['Prenom'];
+		$donneesMedecin = array('nomMedecin' => $nomMedecin, 'prenomMedecin' => $prenomMedecin);
+	
+		$id_patient = $this->params ()->fromPost ( 'id_patient', 0 );
+		$infosPatient = $this->getConsultationTable()->getInfoPatient($id_patient);
+	
+		$id_admission = $this->params ()->fromPost ( 'id_admission', 0 );
+		$InfoAdmission = $this->getAdmissionTable()->getPatientAdmisBloc($id_admission);
+		$listeDiagnostic = $this->getPatientTable()->getAdmissionDiagnosticBloc($id_admission);
+		
+		$infosDiagnostics = ""; 
+		$idiag=1;
+		foreach ($listeDiagnostic as $listeDiag){
+			if($idiag == $listeDiagnostic->count()){
+				$infosDiagnostics .= $listeDiag['Libelle'].' '.$listeDiag['precision_diagnostic'];
+			}else{
+				$infosDiagnostics .= $listeDiag['Libelle'].' '.$listeDiag['precision_diagnostic'].' + ';
+			}
+			$idiag++;
+		}
+	
+		if($infosDiagnostics == ""){
+			$infosDiagnostics = $InfoAdmission['diagnostic'];
+		}
+		
+		//Récupération des données des infos de l'en-tête
+		//Récupération des données des infos de l'en-tête
+		//Récupération des données des infos de l'en-tête
+		$InfosEnTete = array();
+		
+		$InfosEnTete['id_patient'] = $id_patient;
+		$InfosEnTete['service'] = $serviceMedecin;
+		$InfosEnTete['salle'] = $InfoAdmission['salle'];
+		$InfosEnTete['anesthesiste'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost ( 'anesthesiste' ) );
+		$InfosEnTete['check_list_securite'] = $this->params ()->fromPost ( 'check_list_securite' );
+		$InfosEnTete['aides_operateurs'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost ( 'aides_operateurs' ));
+		$InfosEnTete['infosNomPrenomOperateur'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost ( 'infoNomPrenomOperateur' ) );
+		$InfosEnTete['dateIntervention'] = $control->getDateInDateTimeDHM( $this->params ()->fromPost ( 'calendrierDateIntervention' ) );
+		if(strlen($InfosEnTete['dateIntervention']) < 10){
+			$InfosEnTete['dateIntervention'] =  (new \DateTime ())->format ( 'd/m/Y' );
+		}
+		
+		
+		//Récupération des données du compte rendu opératoire
+		//Récupération des données du compte rendu opératoire
+		//Récupération des données du compte rendu opératoire
+		$tabInformations = array();
+		
+		$tabInformations[0]['titre'] = "Diagnostic";
+		$tabInformations[0]['type' ] = 1;
+		$tabInformations[0]['texte'] = iconv ('UTF-8' , 'windows-1252', $infosDiagnostics);
+		
+		$tabInformations[1]['titre'] = "Indication";
+		$tabInformations[1]['type' ] = 1;
+		$tabInformations[1]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost (  'indication' ));
+
+		$tabInformations[2]['titre'] = iconv ('UTF-8' , 'windows-1252', "Intervention prévue");
+		$tabInformations[2]['type' ] = 1;
+		$tabInformations[2]['texte'] = iconv ('UTF-8' , 'windows-1252', $InfoAdmission['intervention_prevue']);
+		
+		$tabInformations[3]['titre'] = iconv ('UTF-8' , 'windows-1252', "Type d'anesthésie");
+		$tabInformations[3]['type' ] = 1;
+		$tabInformations[3]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost (  'type_anesthesie' ));
+		
+		$tabInformations[4]['titre'] = iconv ('UTF-8' , 'windows-1252', "N° VPA");
+		$tabInformations[4]['type' ] = 1;
+		$tabInformations[4]['texte'] = iconv ('UTF-8' , 'windows-1252', $InfoAdmission['vpa']);
+		
+		$tabInformations[5]['titre'] = iconv ('UTF-8' , 'windows-1252', "Protocole opératoire");
+		$tabInformations[5]['type' ] = 2;
+		$tabInformations[5]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params()->fromPost('protocole_operatoire'));
+		
+		$tabInformations[6]['titre'] = "Complication";
+		$tabInformations[6]['type' ] = 2;
+		$tabInformations[6]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params()->fromPost('complications'));
+		
+		$tabInformations[7]['titre'] = iconv ('UTF-8' , 'windows-1252', "Soins post-opératoire");
+		$tabInformations[7]['type' ] = 2;
+		$tabInformations[7]['texte'] = iconv ('UTF-8' , 'windows-1252', $this->params()->fromPost('soins_post_operatoire'));
+		
+		
+		$pdf = new PDF();
+		$pdf->SetMargins(13.5,13.5,13.5);
+		
+		$pdf->setInfosPatients($infosPatient);
+		$pdf->setTabInformations($tabInformations);
+		$pdf->setInfosEnTete($InfosEnTete);
+		
+		$pdf->ImpressionCompteRenduOperatoire();
+		$pdf->Output('I');
+		
+		
+	}
+	
 	
 	public function enregistrerProtocoleOperatoireAction(){
 		
@@ -6235,8 +6388,8 @@ class ConsultationController extends AbstractActionController {
 		$prenomNom = $user['Prenom'].' '.$user['Nom'];
 		
 		$formPO = new ProtocoleOperatoireForm();
-		$listeProtocolePO = $this->getAdmissionTable()->getListeProtocoleOperatoireBloc();
-		$listeProtocoleSOP = $this->getAdmissionTable()->getListeSoinsPostOperatoireBloc();
+		$listeProtocolePO = $this->getAdmissionTable()->getListeProtocoleOperatoireBloc2();
+		$listeProtocoleSOP = $this->getAdmissionTable()->getListeSoinsPostOperatoireBloc2();
 		$listeIndicationPO = $this->getAdmissionTable()->getListeIndicationPOBloc();
 		$listeTypeAnesthesiePO = $this->getAdmissionTable()->getListeTypeAnesthesiePOBloc();
 		
@@ -6383,9 +6536,32 @@ class ConsultationController extends AbstractActionController {
 		$visitePA = '<span id="semaineDebutFin" style="cursor:pointer; padding-right: 20px; text-decoration: none;">  Re&ccedil;u le '. $this->controlDate->convertDate( $InfoAdmis['date'] ) .' &agrave; '.$InfoAdmis['heure'] .'</span>';
 		$visitePA .= '<div style="border-bottom: 1px solid gray; margin-top: 10px; margin-bottom: 20px;"></div>';
 			
+		
+		
+		$tabInfosDiagnostic = $this->getAdmissionDiagnosticBlocTable()->getAdmissionDiagnosticBloc($idAdmission);
+		$infosDiagnostic = "";
+		for($i=0 ; $i<count($tabInfosDiagnostic) ; $i++){
+		
+			if(($i+1) == count($tabInfosDiagnostic)){
+				$diagnostic = $this->getDiagnosticBlocTable()->getDiagnosticBloc($tabInfosDiagnostic[$i]['id_diagnostic']);
+				$infosDiagnostic .= str_replace("'", "\'", $diagnostic->libelle.' '. $tabInfosDiagnostic[$i]['precision_diagnostic']);
+			}else{
+				$diagnostic = $this->getDiagnosticBlocTable()->getDiagnosticBloc($tabInfosDiagnostic[$i]['id_diagnostic']);
+				$infosDiagnostic .= str_replace("'", "\'", $diagnostic->libelle.' '. $tabInfosDiagnostic[$i]['precision_diagnostic']).' + ';
+			}
+				
+		}
+			
+		if($infosDiagnostic == ""){
+			$infosDiagnostic = str_replace("'", "\'",$InfoAdmis['diagnostic']);
+		}
+		
+		
+		
+		
 		$visitePA .= '<table style="width: 100%;">';
 		$visitePA .='<tr style="width: 100%; ">';
-		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['diagnostic']).' </p></td>';
+		$visitePA .='<td style="width: 35%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Diagnostic</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.$infosDiagnostic.' </p></td>';
 		$visitePA .='<td style="width: 30%; padding-top: 15px; padding-right: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Intervention pr&eacute;vue</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['intervention_prevue']).' </p></td>';
 		$visitePA .='<td style="width: 20%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">VPA</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['vpa']).' </p></td>';
 		$visitePA .='<td style="width: 15%; padding-top: 15px;"><span style="text-decoration:underline; font-weight:bold; font-size:17px; color: #065d10; font-family: Times  New Roman;">Salle</span><br><p id="zoneChampInfo1" style="background:#f8faf8; font-size:19px; padding-left: 5px;"> '.str_replace("'", "\'",$InfoAdmis['salle']).' </p></td>';
@@ -7194,6 +7370,8 @@ class ConsultationController extends AbstractActionController {
 	
 	
 	
-	//PARTIE MATERNITE --- PARTIE MATERNITE --- PARTIE MATERNITE --- 
-	//PARTIE MATERNITE --- PARTIE MATERNITE --- PARTIE MATERNITE --- 
+	
+	
+	
 }
+

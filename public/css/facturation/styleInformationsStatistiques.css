@@ -204,7 +204,7 @@ div .dataTables_paginate
     box-shadow: 0pt 0pt 12px rgba(0, 0, 0, 0.5);
 }
 
-#contenuPageA, #contenuPageB {
+#contenuPageA, #contenuPageB, #contenuPageC {
     background: #fff; 
     max-height: 1000px;
     border: 2px solid #ccc ;
@@ -1088,3 +1088,90 @@ font-family: Goudy Old Style;
 	word-wrap: break-word;
 	
 }
+
+
+
+#tableauResultatRapportOptionChoisi .titreTableauInfosStatistiques{
+	padding-bottom: 5px;
+    padding-top : 13px;
+	width: 100%;
+	background: #f1f1f1;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+#tableauResultatRapportOptionChoisi .ligneTitreTableauInfos:hover{
+	background: #f1f1f1;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+#tableauResultatRapportOptionChoisi .ligneTitreTableauInfos{
+	width: 100%;
+	border-bottom: 1px solid #cccccc;
+	font-size: 17px;
+	font-style: times new roman;
+	font-weight: bold;
+}
+
+#tableauResultatRapportOptionChoisi .ligneTitreTableauInfos td{
+	padding-left: 10px;
+}
+
+
+#tableauResultatRapportOptionChoisi .tableauInfosStatistiques{
+    padding-bottom: 5px;
+    padding-top : 13px;
+	width: 100%;
+}
+
+#tableauResultatRapportOptionChoisi .tableauInfosStatistiques td{
+	border: 1px solid #cccccc;
+	border-left: 1px solid #cccccc;
+}
+
+#tableauResultatRapportOptionChoisi .infosPath{
+	padding-left: 10px;
+}
+
+#tableauResultatRapportOptionChoisi .contenuTableauResultatOptionChoisi{
+	width: 99%;
+	min-height: 10px;
+	border: 1px solid #cccccc;
+    box-shadow: 0pt 2pt 6px rgba(0, 0, 0, 0.2);
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	margin-bottom: 35px;
+}
+
+.piedTableauTotal, .piedTableauTotal tr{
+	width: 100%;
+}
+
+.piedTableauTotal tr td{
+	width: 100%;
+}
+
+.piedTableauTotal{
+	margin-top: 0px;
+	border-bottom-right-radius: 10px;
+}
+
+.piedTableauTotal .colPiedTabTotal{
+	border: 1px solid #cccccc;
+	border-top: 2px solid #cccccc;
+	text-align: right;
+	padding-right: 15px;
+	background: #f4f4f4;
+	font-weight: bold;
+	font-size: 17px;
+}
+
+.piedTableauTotal .col2PiedTabTotal{
+	
+}
+
+.piedTableauTotal .col3PiedTabTotal{
+	border-bottom-right-radius: 10px;
+}
+

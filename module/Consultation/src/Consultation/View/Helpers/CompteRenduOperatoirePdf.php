@@ -115,7 +115,7 @@ class CompteRenduOperatoirePdf
 // 		$this->_page->drawText($this->_DonneesMedecin['prenomMedecin'].' '.$this->_DonneesMedecin['nomMedecin'],
 // 				$this->_leftMargin + 350,
 // 				$this->_pageHeight - 80);
-		$this->_page->drawText($this->_infoNomPrenomOperateur,
+		$this->_page->drawText(iconv ('UTF-8' ,'ISO-8859-1' ,$this->_infoNomPrenomOperateur),
 				$this->_leftMargin + 350,
 				$this->_pageHeight - 80);
 
@@ -313,7 +313,7 @@ class CompteRenduOperatoirePdf
 					$this->_leftMargin+155,
 					$this->_yPosition);
 			$this->_page->setFont($this->_newTime, 11);
-			$this->_page->drawText($this->_DonneesPatient['PRENOM'].' '.$this->_DonneesPatient['NOM'],
+			$this->_page->drawText(iconv ('UTF-8' ,'ISO-8859-1' ,$this->_DonneesPatient['PRENOM'].' '.$this->_DonneesPatient['NOM']),
 					$this->_leftMargin+240,
 					$this->_yPosition);
 			//-----------------------------------------------

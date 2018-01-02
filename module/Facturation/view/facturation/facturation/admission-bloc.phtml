@@ -87,8 +87,8 @@ initialisation();
 
 		  <?php $today = new \DateTime('now');
 		  $date = $today->format ( 'd/m/Y H:i' );?>
-		  <div id="titre_info_deces">Programme op&eacute;ratoire<div style='float:right; margin-right:15px; font-size:14px;'> <input name='semainedatedebut' type='hidden' ><input name='semainedatefin' type='hidden'>  <span id='semaineDebutFin' style='cursor:pointer; padding-right: 20px; text-decoration: none;'> ---- </span> | <span style='padding-left: 20px;'> Saint-Louis le, <?php echo $date;?> </span> </div></div>
-		  <div id="barre_separateur">
+		  <div id="titre_info_deces_prolonger">Programme op&eacute;ratoire<div style='float:right; margin-right:15px; font-size:14px;'> <input name='semainedatedebut' type='hidden' ><input name='semainedatefin' type='hidden'>  <span id='semaineDebutFin' style='cursor:pointer; padding-right: 20px; text-decoration: none;'>  </span>  <span style='padding-left: 20px;'> Saint-Louis le, <?php echo $date;?> </span> </div></div>
+		  <div id="barre_separateur_prolonger">
 		  </div>
 
 		  <?php $form = $this->form ;
@@ -98,26 +98,53 @@ initialisation();
 		        echo $this->form()->openTag($form);
 		       ?>
 		  <?php echo $this->formhidden($form->get('id_patient')); ?>    
+		  <?php echo $this->formhidden($form->get('nb_diagnostic')); ?>    
 		  <div id="info_bebe" style='width: 100%; margin-top:10px; height:185px;'>
-               <div style="float:left; width:18%; height:5%;">
+               <div style="float:left; width:4%; height:5%;">
+                 <img class='iconeAjouterAdmissionDiagnostic' onclick='ajouterAdmissionDiagnostic();' src='<?php echo $this->basePath().'/img/light/plus.png'?>' title='ajouter un diagnostic' >
 		       </div>
 		       
-		       <div style='width: 77%; float:left;'>
+		       <div style='width: 94%; float:left;'>
 		         <table id="form_patient" style="width:100%;">
-		             <tr id="form_patient_radio" style='width: 100%;'>
-		                 <td style='width: 33%;' class="comment-form-patient"><?php echo $this->formRow($form->get('diagnostic'));?></td>
-		                 <td style='width: 33%;' class="comment-form-patient"><?php echo $this->formRow($form->get('intervention_prevue'));?></td>
-		                 <td style='width: 33%;' class="comment-form-patient"> <span id="urgenceSelect" style="float: right; margin-right: 20px; font-family: time new romans;"> Urgence <input name="urgenceCheckbox" style="position: relative; float: right; margin-left: 10px;" type="checkbox"> </span><?php echo $this->formRow($form->get('vpa'));?> </td>
+		             <tr id="form_patient_radio" style='width: 100%; vertical-align: top;'>
+		                 <td rowspan='2' style='width: 45%;' class="label-form-diagnostic">
+		                   <div class='contenu-form-diagnostic' style='width: 100%; padding-top: 13px;'>
+		                    <table  style='width: 100%;'>
+		                       <tr class='rowDiagnostic_0' style='width: 100%;'> </tr>
+		                       
+		                    </table>
+		                    
+		                    <table style='width: 100%;'>
+		                       <tr style='width: 100%;'> 
+		                          <td style='width: 100%; height: 30px;'>
+		                             <img class='iconeAnnulerDiag' onclick='enleverUnDiagnostic();' src='../images_icons/icone_minus.png' >
+                                     <img class='iconeAjouterDiag' onclick='ajouterUnDiagnostic();' src='../images_icons/icone_plus.png' >
+		                          </td>
+		                       </tr>
+		                    </table>
+		                    
+		                   </div>
+		                 </td>
+		                 <td style='width: 26%;' class="comment-form-patient"><?php echo $this->formRow($form->get('intervention_prevue'));?></td>
+		                 <td style='width: 29%;' class="comment-form-patient"> 
+		                    <div style='width: 65%; height: 30px; float: left;'>
+		                       <span id="urgenceSelect" style="float: right; margin-right: 20px; font-family: time new romans;"> Urgence <input name="urgenceCheckbox" style="position: relative; float: right; margin-left: 10px;" type="checkbox"> </span>
+		                       <?php echo $this->formRow($form->get('vpa'));?>
+		                    </div>
+		                    
+		                    <div style='width: 35%; height: 30px; float: left;'>
+		                       <?php echo $this->formRow($form->get('salle'));?>
+		                    </div>
+		                 </td>
 		             </tr>
 		         
 		             <tr style='width: 100%;'>
-		                 <td class="comment-form-patient" style='width: 33%;'><?php echo $this->formRow($form->get('salle'));?></td>
-		                 <td class="comment-form-patient" style='width: 33%;'><?php echo $this->formRow($form->get('operateur'));?></td>
-		                 <td class="comment-form-patient" style='width: 33%;'><?php echo $this->formRow($form->get('service'));?></td>
+		                 <td class="comment-form-patient" style='width: 26%;'><?php echo $this->formRow($form->get('operateur'));?></td>
+		                 <td class="comment-form-patient" style='width: 29%;'><?php echo $this->formRow($form->get('service'));?></td>
 		             </tr>
 		         </table>
 		       </div>
-		       <div style="float:left; width:5%;">
+		       <div style="float:left; width:2%;">
 		       </div>
 		  </div>
 
@@ -156,9 +183,70 @@ initialisation();
          <li><a id="quitterCTX"  style="cursor: pointer;">Quitter</a></li>
     </ul>
 </div>
+
+<div id='scriptAutocompletionDiagnostic'> </div>
+		
+		
+		
+<!-- GESTION DE L'INTERFACE D'AJOUT DES DIAGNOSTICS -->
+<!-- GESTION DE L'INTERFACE D'AJOUT DES DIAGNOSTICS -->
+<!-- GESTION DE L'INTERFACE D'AJOUT DES DIAGNOSTICS -->
+
+<div id="ajouterDesDiagnostics" title="Ajouter des diagnostics" style="display: none;" >
+
+    <table class="interfaceAjoutDesDiagnostics">
+        <tr>
+            <td>
+              <label>  Ajouter un diagnostic </label>
+              <div class="ajouterUnDiagnostic">
+                  <table class="tableAjoutDiagnostic"> 
+                     <!-- Contient l'interface d'ajout d'un diagnostic --> 
+                     <tr class='rowAjoutDiagnostic_0'></tr>
+                  </table>
+                  
+                  <table style='width: 100%;' class="buttonTableAjoutDiagnostic">
+		             <tr style='width: 100%;'> 
+		               <td style='width: 100%; height: 30px;'>
+		                  <img class='iconeAnnulerChampDiag' onclick='enleverUnChampAjoutDiagnostic();' src='../images_icons/icone_minus.png' >
+                          <img class='iconeAjouterChampDiag' onclick='ajouterUnChampAjoutDiagnostic();' src='../images_icons/icone_plus.png' >
+                          <button onclick='enregistrerNouveauxDiagnostics();'>Enregistrer</button>
+		               </td>
+		             </tr>
+		          </table>
+              </div>
+            </td>
+            
+            <td>
+               <label> Liste des diagnostics </label>
+               <div class="listeDesDiagnosticsExistants"> 
+                   <table> <!-- Contient la liste des diagnostics --> </table>
+               </div>
+            </td>
+        </tr>
+    </table>
+    
+</div>
+
+		
+		
+<div id="modifierDiagnosticBloc" title="Modifier le diagnostic" style="display: none;" >
+   <div class="affichageMessageInfos" align="center"> <div> MODIFIER LE DIAGNOSTIC SUIVANT </div>  </div>
+   <table id="infosConfirmationModification"> </table>
+   <div class="affichageMessageInfos" align="center"> <div> PAR </div>  </div>
+   <div id="affichageMessageInfosRemplaceModification" align="center"> <input type='text'>  </div>
+</div>		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 <script>
+appelScriptAutoCompletionDiagnostic();
 animation();
 $('#service').val("").attr({'disabled':'true'}).css({'background':'#f3f3f3'});
 $('#operateur').val("");
