@@ -5972,7 +5972,7 @@ class ConsultationController extends AbstractActionController {
 		$InfosEnTete = array();
 		
 		$InfosEnTete['id_patient'] = $id_patient;
-		$InfosEnTete['service'] = $serviceMedecin;
+		$InfosEnTete['service'] = iconv ('UTF-8' , 'windows-1252', $serviceMedecin);
 		$InfosEnTete['salle'] = $InfoAdmission['salle'];
 		$InfosEnTete['anesthesiste'] = iconv ('UTF-8' , 'windows-1252', $this->params ()->fromPost ( 'anesthesiste' ) );
 		$InfosEnTete['check_list_securite'] = $this->params ()->fromPost ( 'check_list_securite' );

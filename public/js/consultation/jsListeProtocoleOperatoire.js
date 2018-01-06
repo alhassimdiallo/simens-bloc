@@ -148,6 +148,7 @@
 		
 	}
     
+	var entreAnnulation = 0;
     function affichervue(idPatient, idAdmission){
 
     	$("#pika2").html('<table> <tr> <td style="margin-top: 20px;"> Chargement </td> </tr>  <tr> <td align="center"> <img style="margin-top: 20px; width: 50px; height: 50px;" src="../images/loading/Chargement_1.gif" /> </td> </tr> </table>');
@@ -172,7 +173,8 @@
             	    		 AppelLecteurMp3(idAdmission); //Appel des audios
             	    	 }); 
             	    	 
-            	    	 $(".boutonTerminer button").click(function(){ 
+            	    	 /*
+            	    	 $(".boutonEnregistrer button").click(function(){ 
             	    		 
             	    		 valeursChamps();
             	    		 if(
@@ -203,6 +205,26 @@
             	    		 }
             	    		 
             	    	 });
+            	    	 */
+            	    	 
+            	    	 $(".boutonEnregistrer button").click(function(){
+                 			$('#enregistrerProtocoleOperatoire').trigger('click');
+                 			
+                 			if( $("#anesthesiste").val()=="" || $("#indication").val()=="" || $("#type_anesthesie").val()=="" || $("#protocole_operatoire").val()=="" || $("#soins_post_operatoire").val()==""){
+                 				$("#CompteRenduTabs a").trigger('click');
+                 				$('#enregistrerProtocoleOperatoire').trigger('click');
+                 			}
+                 		});
+                 	    	 
+                 		if(entreAnnulation == 0){
+                     		$(".boutonAnnuler button").click(function(){
+                     			$("#titre2").replaceWith("<div id='titre' style='font-family: police2; color: green; font-size: 18px; font-weight: bold; padding-left: 20px;'><iS style='font-size: 25px;'>&curren;</iS> LISTE DES PATIENTS </div>");
+                     			$("#informationAdmissionBloc").fadeOut(function(){ $("#contenu").fadeIn("fast"); });
+                     			supprimerImagesAnnulation();
+                     			return false;
+                     		});
+                     		entreAnnulation = 1;
+                 		}
             	    	 
             	     }); 
             	     
@@ -218,8 +240,11 @@
     	$( "#tabs" ).tabs();
     	
     	$( "#accordions" ).accordion();
-    	$(".boutonTerminer").html('<button type="submit" id="terminer" style=" font-family: police2; font-size: 17px; font-weight: bold;"> Terminer </button>');
-
+    	$(".boutonAnnuler").html('<button type="submit" id="annuler" style=" font-family: police2; font-size: 17px; font-weight: bold;"> Annuler </button>');
+    	$(".boutonEnregistrer").html('<button type="submit" id="enregistrer" style=" font-family: police2; font-size: 17px; font-weight: bold;"> Enregistrer </button>');
+    	//$(".boutonTerminer").html('<button type="submit" id="terminer" style=" font-family: police2; font-size: 17px; font-weight: bold;"> Terminer </button>');
+    	
+    	
     	var oTable;
     	$("#informationAdmissionBloc").toggle(false);
     	oTable = $('#patient').dataTable

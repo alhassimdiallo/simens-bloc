@@ -83,7 +83,7 @@ class DiagnosticTable {
 		$listeDiagnostic = $this->tableGateway->select(function(Select $select){
 			$select->join(array('adb' => 'admission_diagnostic_bloc'), 'adb.id_diagnostic = id', array('*'));
 			$select->join(array('ab' => 'admission_bloc'), 'ab.id_admission = adb.id_admission', array('*'));
-			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.id_employe', array('*'));
+			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.operateur', array('*'));
 			$select->join(array('s' => 'service'), 's.ID_SERVICE = se.id_service', array('NOM','ID_SERVICE'));
 			$select->order(array('NOM DESC', 'id ASC'));
 			$select->group('NOM');
@@ -109,7 +109,7 @@ class DiagnosticTable {
 		$listeDiagnostic = $this->tableGateway->select(function(Select $select){
 			$select->join(array('adb' => 'admission_diagnostic_bloc'), 'adb.id_diagnostic = id', array('*'));
 			$select->join(array('ab' => 'admission_bloc'), 'ab.id_admission = adb.id_admission', array('*'));
-			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.id_employe', array('*'));
+			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.operateur', array('*'));
 			$select->join(array('s' => 'service'), 's.ID_SERVICE = se.id_service', array('NOM'));
 			$select->order(array('NOM DESC', 'id ASC'));
 		})->toArray();
@@ -125,7 +125,7 @@ class DiagnosticTable {
 		$listeDiagnostic = $this->tableGateway->select(function(Select $select) use ($id_service){
 			$select->join(array('adb' => 'admission_diagnostic_bloc'), 'adb.id_diagnostic = id', array('*'));
 			$select->join(array('ab' => 'admission_bloc'), 'ab.id_admission = adb.id_admission', array('*'));
-			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.id_employe', array('*'));
+			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.operateur', array('*'));
 			$select->join(array('s' => 'service'), 's.ID_SERVICE = se.id_service', array('NOM'));
 			$select->where(array('s.ID_SERVICE' => $id_service));
 			$select->order(array('NOM DESC', 'id ASC'));
@@ -143,7 +143,7 @@ class DiagnosticTable {
 		$listeDiagnostic = $this->tableGateway->select(function(Select $select) use ($date_debut, $date_fin){
 			$select->join(array('adb' => 'admission_diagnostic_bloc'), 'adb.id_diagnostic = id', array('*'));
 			$select->join(array('ab' => 'admission_bloc'), 'ab.id_admission = adb.id_admission', array('*'));
-			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.id_employe', array('*'));
+			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.operateur', array('*'));
 			$select->join(array('s' => 'service'), 's.ID_SERVICE = se.id_service', array('NOM'));
 			$select->where(array('ab.date  >= ?' => $date_debut, 'ab.date <= ?' => $date_fin));
 			$select->order(array('NOM DESC', 'id ASC'));
@@ -161,7 +161,7 @@ class DiagnosticTable {
 		$listeDiagnostic = $this->tableGateway->select(function(Select $select) use ($id_service, $date_debut, $date_fin){
 			$select->join(array('adb' => 'admission_diagnostic_bloc'), 'adb.id_diagnostic = id', array('*'));
 			$select->join(array('ab' => 'admission_bloc'), 'ab.id_admission = adb.id_admission', array('*'));
-			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.id_employe', array('*'));
+			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.operateur', array('*'));
 			$select->join(array('s' => 'service'), 's.ID_SERVICE = se.id_service', array('NOM'));
 			$select->where(array('s.ID_SERVICE' => $id_service, 'ab.date  >= ?' => $date_debut, 'ab.date <= ?' => $date_fin));
 			$select->order(array('NOM DESC', 'id ASC'));
@@ -179,7 +179,7 @@ class DiagnosticTable {
 		$listeDiagnostic = $this->tableGateway->select(function(Select $select) use ($id_diagnostic, $date_debut, $date_fin){
 			$select->join(array('adb' => 'admission_diagnostic_bloc'), 'adb.id_diagnostic = id', array('*'));
 			$select->join(array('ab' => 'admission_bloc'), 'ab.id_admission = adb.id_admission', array('*'));
-			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.id_employe', array('*'));
+			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.operateur', array('*'));
 			$select->join(array('s' => 'service'), 's.ID_SERVICE = se.id_service', array('NOM'));
 			$select->where(array('adb.id_diagnostic' => $id_diagnostic, 'ab.date  >= ?' => $date_debut, 'ab.date <= ?' => $date_fin));
 			$select->order(array('NOM DESC', 'id ASC'));
@@ -196,7 +196,7 @@ class DiagnosticTable {
 		$listeDiagnostic = $this->tableGateway->select(function(Select $select) use ($id_diagnostic){
 			$select->join(array('adb' => 'admission_diagnostic_bloc'), 'adb.id_diagnostic = id', array('*'));
 			$select->join(array('ab' => 'admission_bloc'), 'ab.id_admission = adb.id_admission', array('*'));
-			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.id_employe', array('*'));
+			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.operateur', array('*'));
 			$select->join(array('s' => 'service'), 's.ID_SERVICE = se.id_service', array('NOM'));
 			$select->where(array('adb.id_diagnostic' => $id_diagnostic,));
 			$select->order(array('NOM DESC', 'id ASC'));
@@ -214,7 +214,7 @@ class DiagnosticTable {
 		$listeDiagnostic = $this->tableGateway->select(function(Select $select) use ($id_diagnostic, $id_service, $date_debut, $date_fin){
 			$select->join(array('adb' => 'admission_diagnostic_bloc'), 'adb.id_diagnostic = id', array('*'));
 			$select->join(array('ab' => 'admission_bloc'), 'ab.id_admission = adb.id_admission', array('*'));
-			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.id_employe', array('*'));
+			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.operateur', array('*'));
 			$select->join(array('s' => 'service'), 's.ID_SERVICE = se.id_service', array('NOM'));
 			$select->where(array('adb.id_diagnostic' => $id_diagnostic, 's.ID_SERVICE' => $id_service, 'ab.date  >= ?' => $date_debut, 'ab.date <= ?' => $date_fin));
 			$select->order(array('NOM DESC', 'id ASC'));
@@ -231,7 +231,7 @@ class DiagnosticTable {
 		$listeDiagnostic = $this->tableGateway->select(function(Select $select) use ($id_diagnostic, $id_service){
 			$select->join(array('adb' => 'admission_diagnostic_bloc'), 'adb.id_diagnostic = id', array('*'));
 			$select->join(array('ab' => 'admission_bloc'), 'ab.id_admission = adb.id_admission', array('*'));
-			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.id_employe', array('*'));
+			$select->join(array('se' => 'service_employe'), 'se.id_employe = ab.operateur', array('*'));
 			$select->join(array('s' => 'service'), 's.ID_SERVICE = se.id_service', array('NOM'));
 			$select->where(array('adb.id_diagnostic' => $id_diagnostic, 's.ID_SERVICE' => $id_service));
 			$select->order(array('NOM DESC', 'id ASC'));
