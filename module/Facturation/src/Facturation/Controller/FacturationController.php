@@ -4270,7 +4270,6 @@ class FacturationController extends AbstractActionController {
 	//GESTION DES IMPRIMES --- GESTION DES IMPRIMES --- GESTION DES IMPRIMES
 	//GESTION DES IMPRIMES --- GESTION DES IMPRIMES --- GESTION DES IMPRIMES
 	public function infosStatImprimeAction() {
-		//$this->layout ()->setTemplate ( 'layout/facturation' );
 	
 		//LES PATIENTS ADMIS ET OPERES
 		$nbPatient = $this->getPatientTable()->nbPatientAdmis();

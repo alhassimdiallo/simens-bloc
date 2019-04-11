@@ -222,7 +222,7 @@ class infosStatistiquePdf extends fpdf
 			$this->AddFont('times','','times.php');
 			
 			$this->SetFont('times','',12.5);
-			$this->Cell(70,8,"Periode du ".$date_debut." au ".$date_fin,'BRT',0,'L',1);
+			$this->Cell(70,8,"Période du ".$date_debut." au ".$date_fin,'BRT',0,'L',1);
 			
 			$this->SetFillColor(255,255,255);
 			$this->Cell(53,7,'','L',0,'L',1);
@@ -266,8 +266,6 @@ class infosStatistiquePdf extends fpdf
 			$toutServiceNbVal = array_count_values($toutService);
 			$totatlDesInterventions = 0;
 			
-			//var_dump($diffLibelleDiagnostic); exit();
-			
 			for($i=0 ; $i<count($diffService) ; $i++){
 					
 				$totatlDesInterventions +=$toutServiceNbVal[$diffService[$i]];
@@ -282,18 +280,6 @@ class infosStatistiquePdf extends fpdf
 			
 					if($prem == 1){
 						
-						
-						/*
-						$html .='<tr style="width: 100%; ">
-						           <td rowspan="'.count($tabDiffLibelleDiagnostic).'" style="width: 35%; height: 40px; background: re; text-align: center;"><span style="font-weight: bold;">'.$diffService[$i].'</span> </br> <span style="font-size: 14px;">(Nombre = <span style="font-size: 15px; font-weight: bold;">'.$toutServiceNbVal[$diffService[$i]].'</span>)</span></td>
-						           <td class="infosPath" style="width: 50%; height: 40px; background: yello;">'.$tabDiffLibelleDiagnostic[$j].'</td>
-						           <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: gree;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
-						         </tr>';
-						//$prem++;
-						*/
-						
-						
-
 						$this->Ln(5.4);
 						$this->SetFillColor(220,220,220);
 						$this->SetDrawColor(205,193,197);
@@ -316,16 +302,6 @@ class infosStatistiquePdf extends fpdf
 						$prem++;
 							
 					}
-					
-					/*
-					else{
-						
-						$html .='<tr style="width: 100%; ">
-                                   <td class="infosPath" style="width: 50%; height: 40px; background: orang;">'.$tabDiffLibelleDiagnostic[$j].'</td>
-                                   <td class="infosPath" style="width: 15%; height: 40px; text-align: right; padding-right: 15px; background: brow;">'.$toutDiagnosticNbVal[$tabDiffLibelleDiagnostic[$j]].'</td>
-                                 </tr>';
-    					
-					}*/
 					
 					
 					$this->SetFont('timesi','',11.3);
