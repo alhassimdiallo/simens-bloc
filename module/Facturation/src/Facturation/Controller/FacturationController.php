@@ -996,7 +996,7 @@ class FacturationController extends AbstractActionController {
 		
 		$form->populateValues($data);
 		
-		$listePatientExistanceBD = $patientTable->getListePatientExistanceBD();
+		$listePatientExistanceBD = array();//$patientTable->getListePatientExistanceBD();
 		
 		
 		//Conversion d'une chaine de caractère 

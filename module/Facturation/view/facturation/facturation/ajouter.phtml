@@ -125,12 +125,12 @@ echo $this->form ()->openTag ( $form );
      
      </script>
      
-     <?php for ($i = 0 ; $i < count($this->listePatientExistanceBD) ; $i++){ ?>
+     <?php /* for ($i = 0 ; $i < count($this->listePatientExistanceBD) ; $i++){ ?>
        <script> myarray[ij++] = "<?php echo strtolower(str_replace(" ", "", $this->listePatientExistanceBD[$i]['Sexe'].''.$this->listePatientExistanceBD[$i]['Nom'].''.$this->listePatientExistanceBD[$i]['Prenom'])); ?>" ; </script>
        <script> myarrayId["<?php echo strtolower(str_replace(" ", "", $this->listePatientExistanceBD[$i]['Sexe'].''.$this->listePatientExistanceBD[$i]['Nom'].''.$this->listePatientExistanceBD[$i]['Prenom'])); ?>"] = "<?php echo $this->listePatientExistanceBD[$i]['Id']; ?>" ; </script>
        <script> myarrayAge["<?php echo strtolower(str_replace(" ", "", $this->listePatientExistanceBD[$i]['Sexe'].''.$this->listePatientExistanceBD[$i]['Nom'].''.$this->listePatientExistanceBD[$i]['Prenom'])); ?>"] = "<?php echo $this->listePatientExistanceBD[$i]['Age']; ?>" ; </script>
        <script> myarrayTelephone["<?php echo strtolower(str_replace(" ", "", $this->listePatientExistanceBD[$i]['Sexe'].''.$this->listePatientExistanceBD[$i]['Nom'].''.$this->listePatientExistanceBD[$i]['Prenom'])); ?>"] = "<?php echo $this->listePatientExistanceBD[$i]['Telephone']; ?>" ; </script>
-     <?php } ?>
+     <?php } */ ?>
      
      <script>
        alertPatientExistant(myarray, myarrayId, myarrayAge, myarrayTelephone);
