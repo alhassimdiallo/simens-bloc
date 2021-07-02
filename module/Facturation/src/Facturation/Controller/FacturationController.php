@@ -2810,6 +2810,12 @@ class FacturationController extends AbstractActionController {
 	//GESTION DES INFORMATIONS STATISTIQUES
 	public function informationsStatistiquesAction() {
 		$this->layout ()->setTemplate ( 'layout/facturation' );
+		/*
+		$listeDiagnosticAdmissionBloc = $this->getDiagnosticBlocTable()->getListeDiagnosticAdmissionBlocPourDiagnosticPourService();
+		echo '<pre>';
+		var_dump($listeDiagnosticAdmissionBloc); exit();
+		echo '</pre>';
+		*/
 		
 		//LES PATIENTS ADMIS ET OPERES
  		$nbPatient = $this->getPatientTable()->nbPatientAdmis();

@@ -47,7 +47,7 @@ function scriptAjoutMp3(){
 				data: data,
 				success: function (response) {
 					// La réponse du serveur
-					var result = jQuery.parseJSON(response); //alert(result); return false;
+					var result = jQuery.parseJSON(response); alert(result); 
 					if(result == 0){
 						alert('format non reconnu: Choissisez un fichier mp3');
 						$("#mp3Waiting").html("");

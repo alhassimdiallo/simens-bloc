@@ -49,7 +49,7 @@ use Consultation\View\Helpers\ProtocoleOperatoirePdf;
 use Consultation\Form\ProtocoleOperatoireForm;
 use Consultation\View\Helpers\CompteRenduOperatoirePdf;
 use Consultation\View\Helpers\CompteRenduOperatoirePage2Pdf;
-use Zend\XmlRpc\Value\String;
+//use Zend\XmlRpc\Value\String;
 use Consultation\View\Helpers\fpdf181\PDF;
 
 class ConsultationController extends AbstractActionController {
@@ -5530,10 +5530,14 @@ class ConsultationController extends AbstractActionController {
 	}
 	
 	public function cheminUrlProjet(){
-	    $baseUrl = $_SERVER['SCRIPT_FILENAME'];
-	    $tabURI  = explode('www', $baseUrl);
-	    $base = explode('public', $tabURI[1]);
-	    return $base[0];
+	    //$baseUrl = $_SERVER['SCRIPT_FILENAME'];
+	    //$tabURI  = explode('www', $baseUrl);
+	    //$base = explode('public', $tabURI[1]);
+	    //return $base[0];
+		
+		$baseUrl = $_SERVER['SCRIPT_FILENAME'];
+	    $tabURI  = explode('public', $baseUrl);
+	    return $tabURI[0];
 	}
 	
 	public function listePatientAdmisBlocAjaxAction() {
@@ -5634,6 +5638,9 @@ class ConsultationController extends AbstractActionController {
 	}
 	
 	public function protocoleOperatoireAction(){
+		
+		//var_dump($this->cheminBaseUrl()); exit();
+		
 		$this->layout()->setTemplate('layout/consultation');
 		$user = $this->layout()->user;
 		$prenomNom = $user['Prenom'].' '.$user['Nom'];
@@ -7155,6 +7162,12 @@ class ConsultationController extends AbstractActionController {
         		 tab['.$i++.'] = {
 	                     "title":"'. $Liste['titre'] .'<span class=\"supprimerSon'.$i.'\" >  </span>",
 		                 "mp3":"'.$this->cheminUrlProjet().'public/audios/protocoles/'. $Liste['nom'] .'",
+						 
+						 //"mp3":"C:\Users\DIALLO\Downloads\Music\SIMENS Systeme Information Medical.mp3",
+						 
+						//"mp3": "http://jplayer.org/audio/mp3/Miaow-07-Bubble.mp3"
+						
+						//m4a: "http://jplayer.org/audio/m4a/Miaow-07-Bubble.m4a",
 		         };
 		         
 		         setTimeout(function() {
@@ -7163,6 +7176,9 @@ class ConsultationController extends AbstractActionController {
 		              $(".supprimerSon'.$i.'").dblclick(function () { supprimerAudioMp3('.$i.'); return false; });
 	                });
                  }, 1000);
+				 
+				//alert("'.$this->cheminUrlProjet().'public/audios/protocoles/'. $Liste['nom'] .'");
+				 
         		 </script>';
 	    }
 	
@@ -7173,7 +7189,7 @@ class ConsultationController extends AbstractActionController {
 		          cssSelectorAncestor: "#jp_container_2"
 	            }, tab , {
 		        swfPath: "'.$this->cheminUrlProjet().'public/js/plugins/jPlayer-2.9.2/dist/jplayer",
-		        supplied: "mp3",
+		        supplied: "m4a, mp3",
 		        wmode: "window",
 		        useStateClassSkin: true,
 		        autoBlur: false,
@@ -7182,7 +7198,7 @@ class ConsultationController extends AbstractActionController {
 		        remainingDuration: true,
 		        toggleDuration: true
 	            });
-                });
+                },1000);
         		scriptAjoutMp3();
                 </script>';
 	     
@@ -7248,15 +7264,19 @@ class ConsultationController extends AbstractActionController {
 	    $tmp = $_FILES['fichier']['tmp_name'];
 	
 	    $date = new \DateTime();
-	    $aujourdhui = $date->format('d-m-y_H-i-s');
+	    $aujourdhui = $date->format('dmy_His');
 	    $nom_file = "";
 	
 	    if($type == 'audio/mp3'){
 	        $nom_file = "audio_".$aujourdhui.".mp3";
 	        $result = move_uploaded_file($tmp, $this->cheminBaseUrl().'public/audios/protocoles/'.$nom_file);
-	    }else 
+	    }else
+		if($type == 'audio/mpeg'){
+	        $nom_file = "audio".$aujourdhui.".mp3";
+	        $result = move_uploaded_file($tmp, $this->cheminBaseUrl().'public/audios/protocoles/'.$nom_file);
+	    }else		
 	       if($type == 'audio/x-m4a'){
-	           $nom_file = "audio_".$aujourdhui.".x-m4a";
+	           $nom_file = "audio_".$aujourdhui.".m4a";
 	           $result = move_uploaded_file($tmp, $this->cheminBaseUrl().'public/audios/protocoles/'.$nom_file);
 	       } else {
 	           $nom_file = 0;
